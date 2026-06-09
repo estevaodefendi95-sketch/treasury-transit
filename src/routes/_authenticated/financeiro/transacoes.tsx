@@ -43,10 +43,12 @@ function TransacoesPage() {
   const { data: transacoes = [] } = useQuery(transactionsQuery(companyId));
   const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
+  const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
   const categorize = useServerFn(categorizeTransaction);
   const learnName = useServerFn(learnNameRule);
 
   const [filter, setFilter] = useState("");
+  const [accountFilter, setAccountFilter] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     type: "expense" as "income" | "expense",
