@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { transactionsQuery, formatBRL, isOverdue, type Transaction } from "@/lib/db";
@@ -14,8 +15,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
-  const { companyId } = useCurrentCompany();
+  const { companyId, profile } = useCurrentCompany();
   const { data: transacoes = [], isLoading } = useQuery(transactionsQuery(companyId));
+  const isAdmin = profile?.role === "admin";
+  const pendingApprovals = transacoes.filter((t) => t.approval_status === "aguardando_aprovacao");
 
   const receitas = transacoes.filter((t) => t.type === "income" && (t.status === "received" || t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
   const despesas = transacoes.filter((t) => t.type === "expense" && (t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
