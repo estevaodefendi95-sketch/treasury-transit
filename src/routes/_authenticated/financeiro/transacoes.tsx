@@ -332,7 +332,7 @@ function TransacoesPage() {
                 const isEditing = editingId === t.id;
                 const isExpanded = expandedId === t.id;
                 return (
-                  <>
+                  <Fragment key={t.id}>
                     <TableRow key={t.id} className="group">
                       <TableCell>{formatDateBR(t.payment_date ?? t.due_date)}</TableCell>
                       <TableCell>
@@ -403,7 +403,7 @@ function TransacoesPage() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </TableBody>
