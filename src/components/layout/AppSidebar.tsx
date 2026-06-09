@@ -24,6 +24,8 @@ import {
   Sparkles,
   Target,
   Receipt,
+  Settings,
+  Banknote,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
@@ -157,6 +159,14 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/configuracoes")}>
+                  <Link to="/configuracoes">
+                    <Settings className="h-4 w-4" />
+                    {!collapsed && <span>Configurações</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
 
           </SidebarGroupContent>
