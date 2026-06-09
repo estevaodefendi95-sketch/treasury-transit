@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCentrosDeCustoRouteRouteImport } from './routes/_authenticated/centros-de-custo/route'
 import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
 import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
 import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
@@ -62,11 +63,17 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCentrosDeCustoRouteRoute =
+  AuthenticatedCentrosDeCustoRouteRouteImport.update({
+    id: '/centros-de-custo',
+    path: '/centros-de-custo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentrosDeCustoIndexRoute =
   AuthenticatedCentrosDeCustoIndexRouteImport.update({
-    id: '/centros-de-custo/',
-    path: '/centros-de-custo/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedCentrosDeCustoRouteRoute,
   } as any)
 const AuthenticatedVendasProdutosRoute =
   AuthenticatedVendasProdutosRouteImport.update({
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/centros-de-custo'
     | '/dashboard'
     | '/notificacoes'
     | '/configuracoes/notificacoes'
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/onboarding'
+    | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
     | '/_authenticated/notificacoes'
     | '/_authenticated/configuracoes/notificacoes'
@@ -354,12 +365,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/centros-de-custo': {
+      id: '/_authenticated/centros-de-custo'
+      path: '/centros-de-custo'
+      fullPath: '/centros-de-custo'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/centros-de-custo/': {
       id: '/_authenticated/centros-de-custo/'
-      path: '/centros-de-custo'
+      path: '/'
       fullPath: '/centros-de-custo/'
       preLoaderRoute: typeof AuthenticatedCentrosDeCustoIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedCentrosDeCustoRouteRoute
     }
     '/_authenticated/vendas/produtos': {
       id: '/_authenticated/vendas/produtos'
@@ -469,7 +487,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedCentrosDeCustoRouteRouteChildren {
+  AuthenticatedCentrosDeCustoIndexRoute: typeof AuthenticatedCentrosDeCustoIndexRoute
+}
+
+const AuthenticatedCentrosDeCustoRouteRouteChildren: AuthenticatedCentrosDeCustoRouteRouteChildren =
+  {
+    AuthenticatedCentrosDeCustoIndexRoute:
+      AuthenticatedCentrosDeCustoIndexRoute,
+  }
+
+const AuthenticatedCentrosDeCustoRouteRouteWithChildren =
+  AuthenticatedCentrosDeCustoRouteRoute._addFileChildren(
+    AuthenticatedCentrosDeCustoRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCentrosDeCustoRouteRoute: typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
@@ -487,10 +521,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVendasClientesRoute: typeof AuthenticatedVendasClientesRoute
   AuthenticatedVendasPedidosRoute: typeof AuthenticatedVendasPedidosRoute
   AuthenticatedVendasProdutosRoute: typeof AuthenticatedVendasProdutosRoute
-  AuthenticatedCentrosDeCustoIndexRoute: typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCentrosDeCustoRouteRoute:
+    AuthenticatedCentrosDeCustoRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedConfiguracoesNotificacoesRoute:
@@ -518,7 +553,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVendasClientesRoute: AuthenticatedVendasClientesRoute,
   AuthenticatedVendasPedidosRoute: AuthenticatedVendasPedidosRoute,
   AuthenticatedVendasProdutosRoute: AuthenticatedVendasProdutosRoute,
-  AuthenticatedCentrosDeCustoIndexRoute: AuthenticatedCentrosDeCustoIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
