@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
 import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
 import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
 import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
@@ -61,6 +62,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCentrosDeCustoIndexRoute =
+  AuthenticatedCentrosDeCustoIndexRouteImport.update({
+    id: '/centros-de-custo/',
+    path: '/centros-de-custo/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedVendasProdutosRoute =
   AuthenticatedVendasProdutosRouteImport.update({
     id: '/vendas/produtos',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -219,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/_authenticated/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/_authenticated/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/_authenticated/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
+    | '/centros-de-custo/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
+    | '/centros-de-custo'
   id:
     | '__root__'
     | '/'
@@ -288,6 +300,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vendas/clientes'
     | '/_authenticated/vendas/pedidos'
     | '/_authenticated/vendas/produtos'
+    | '/_authenticated/centros-de-custo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -339,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centros-de-custo/': {
+      id: '/_authenticated/centros-de-custo/'
+      path: '/centros-de-custo'
+      fullPath: '/centros-de-custo/'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vendas/produtos': {
@@ -467,6 +487,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVendasClientesRoute: typeof AuthenticatedVendasClientesRoute
   AuthenticatedVendasPedidosRoute: typeof AuthenticatedVendasPedidosRoute
   AuthenticatedVendasProdutosRoute: typeof AuthenticatedVendasProdutosRoute
+  AuthenticatedCentrosDeCustoIndexRoute: typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -497,6 +518,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVendasClientesRoute: AuthenticatedVendasClientesRoute,
   AuthenticatedVendasPedidosRoute: AuthenticatedVendasPedidosRoute,
   AuthenticatedVendasProdutosRoute: AuthenticatedVendasProdutosRoute,
+  AuthenticatedCentrosDeCustoIndexRoute: AuthenticatedCentrosDeCustoIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
