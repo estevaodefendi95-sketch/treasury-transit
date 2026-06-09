@@ -501,6 +501,108 @@ export const nameRulesQuery = (companyId: string | null | undefined) =>
     enabled: !!companyId,
   });
 
+// ---------- Fase 3: Notifications + Cost Centers ----------
+export type NotificationType =
+  | "vencimento_hoje"
+  | "vencimento_amanha"
+  | "vencimento_3dias"
+  | "pagamento_recebido"
+  | "saldo_negativo"
+  | "aprovacao_pendente"
+  | "aprovacao_concluida"
+  | "orcamento_estourado"
+  | "saldo_minimo";
+
+export type AppNotification = {
+  id: string;
+  company_id: string;
+  user_id: string | null;
+  type: NotificationType | string;
+  title: string;
+  message: string | null;
+  link_url: string | null;
+  is_read: boolean | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+export type CostCenter = {
+  id: string;
+  company_id: string;
+  name: string;
+  code: string | null;
+  description: string | null;
+  monthly_budget: number | null;
+  color?: string | null;
+  is_active: boolean | null;
+  created_at?: string;
+};
+
+export const fetchNotifications = async (companyId: string): Promise<AppNotification[]> => {
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (data ?? []) as AppNotification[];
+};
+
+export const notificationsQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["notifications", companyId],
+    queryFn: () => (companyId ? fetchNotifications(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+    refetchInterval: 60_000,
+  });
+
+export const fetchCostCenters = listByCompany<CostCenter>("cost_centers");
+export const costCentersQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["cost_centers", companyId],
+    queryFn: () => (companyId ? fetchCostCenters(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export const DEFAULT_NOTIFICATION_PREFS: Record<NotificationType, boolean> = {
+  vencimento_hoje: true,
+  vencimento_amanha: true,
+  vencimento_3dias: true,
+  pagamento_recebido: true,
+  saldo_negativo: true,
+  aprovacao_pendente: true,
+  aprovacao_concluida: true,
+  orcamento_estourado: true,
+  saldo_minimo: true,
+};
+
+export const NOTIFICATION_META: Record<string, { icon: string; color: string; label: string }> = {
+  vencimento_hoje: { icon: "🔴", color: "text-rose-600 bg-rose-50", label: "Vence hoje" },
+  vencimento_amanha: { icon: "🟡", color: "text-amber-700 bg-amber-50", label: "Vence amanhã" },
+  vencimento_3dias: { icon: "🟠", color: "text-orange-600 bg-orange-50", label: "Vence em 3 dias" },
+  pagamento_recebido: { icon: "✅", color: "text-emerald-600 bg-emerald-50", label: "Pagamento recebido" },
+  saldo_negativo: { icon: "⚠️", color: "text-rose-600 bg-rose-50", label: "Saldo negativo" },
+  aprovacao_pendente: { icon: "📋", color: "text-indigo-600 bg-indigo-50", label: "Aprovação pendente" },
+  aprovacao_concluida: { icon: "✓", color: "text-emerald-600 bg-emerald-50", label: "Aprovação concluída" },
+  orcamento_estourado: { icon: "📊", color: "text-rose-600 bg-rose-50", label: "Orçamento estourado" },
+  saldo_minimo: { icon: "🏦", color: "text-amber-700 bg-amber-50", label: "Saldo mínimo" },
+};
+
+export const timeAgo = (iso: string): string => {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return `há ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `há ${h} ${h === 1 ? "hora" : "horas"}`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `há ${d} ${d === 1 ? "dia" : "dias"}`;
+  const mo = Math.floor(d / 30);
+  return `há ${mo} ${mo === 1 ? "mês" : "meses"}`;
+};
+
+
 export function applyNameRules(description: string, rules: NameRule[]): { name: string; matched: NameRule | null } {
   const lower = description.toLowerCase();
   for (const r of rules) {
