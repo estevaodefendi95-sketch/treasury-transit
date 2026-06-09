@@ -311,10 +311,32 @@ function TransacoesPage() {
 
                 <PaymentMethodFields value={payment} amount={amountNum} onChange={setPayment} />
 
+                <div className="space-y-2">
+                  <Label>Centro de custo (opcional)</Label>
+                  <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    value={form.cost_center_id ?? ""}
+                    onChange={(e) => setForm({ ...form, cost_center_id: e.target.value })}>
+                    <option value="">— Nenhum —</option>
+                    {costCenters.filter((c) => c.is_active).map((c) => (
+                      <option key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
                 <RecurrenceSelect
                   value={form.recurrence}
                   onChange={(r) => setForm({ ...form, recurrence: r })}
                 />
+
+                <div className="space-y-2">
+                  <Label>Comprovante</Label>
+                  <AttachmentField
+                    companyId={companyId}
+                    recordId={pendingDraftId}
+                    value={pendingAttachment}
+                    onChange={setPendingAttachment}
+                  />
+                </div>
 
                 <Button onClick={() => create.mutate()} disabled={create.isPending || !form.description || !form.amount} className="w-full">
                   {create.isPending ? "Salvando..." : "Criar"}
@@ -327,14 +349,22 @@ function TransacoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Histórico</CardTitle>
-          <div className="flex gap-2 mt-2">
-            <div className="relative flex-1">
+          <div className="flex flex-wrap gap-2 mt-2 items-center">
+            <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input className="pl-8" placeholder="Buscar..." value={filter} onChange={(e) => setFilter(e.target.value)} />
             </div>
             <AccountFilter accounts={bankAccounts} value={accountFilter} onChange={setAccountFilter} />
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+              <Checkbox
+                checked={onlyMissingAttachment}
+                onCheckedChange={(v) => setOnlyMissingAttachment(!!v)}
+              />
+              Sem comprovante
+            </label>
           </div>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
