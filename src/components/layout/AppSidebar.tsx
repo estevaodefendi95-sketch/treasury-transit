@@ -15,6 +15,8 @@ import {
   Tags,
   Upload,
   Wand2,
+  Landmark,
+  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
