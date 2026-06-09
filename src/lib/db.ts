@@ -204,7 +204,6 @@ export async function createCompanyAndLink(input: {
       company_id: companyId,
       full_name: input.fullName,
       email: input.email,
-      role: "owner",
     },
     { onConflict: "id" },
   );
@@ -251,7 +250,8 @@ export async function seedDefaultCategories(companyId: string): Promise<void> {
     icon: c.icon,
     is_active: true,
   }));
-  await supabase.from("categories").insert(rows);
+  const { error } = await supabase.from("categories").insert(rows);
+  if (error) throw error;
 }
 
 // ---------- Query options (TanStack Query) ----------
