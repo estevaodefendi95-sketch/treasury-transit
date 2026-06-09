@@ -22,6 +22,8 @@ import {
   ClipboardCheck,
   BarChart3,
   Sparkles,
+  Target,
+  Receipt,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
