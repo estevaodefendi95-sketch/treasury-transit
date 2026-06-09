@@ -126,8 +126,9 @@ function TransacoesPage() {
   };
 
   const resetForm = () => {
-    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", recurrence: "unico" });
+    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", cost_center_id: "", recurrence: "unico" });
     setPayment(emptyPaymentFields);
+    setPendingAttachment(null);
     setSuggestion(null);
     setAutoApplied(false);
   };
@@ -145,8 +146,10 @@ function TransacoesPage() {
         amount,
         due_date: form.due_date,
         category_id: form.category_id || null,
+        cost_center_id: form.cost_center_id || null,
         category_auto_applied: autoApplied,
         payment_method: payment.payment_method || null,
+        attachment_url: pendingAttachment,
         // PIX
         pix_key_type: payment.pix_key_type || null,
         pix_key: payment.pix_key || null,
@@ -160,6 +163,7 @@ function TransacoesPage() {
         card_installments: installments > 1 ? installments : null,
         card_invoice_date: payment.card_invoice_date || null,
       };
+
       const count = await createTransactionSeries(base, {
         recurrence: form.recurrence,
         installments,
