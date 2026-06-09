@@ -17,6 +17,8 @@ import {
   Wand2,
   Landmark,
   CreditCard,
+  Building2,
+  Bell,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -45,6 +47,7 @@ const financeiroItems = [
   { title: "Contas a Receber", url: "/financeiro/contas-receber", icon: ArrowDownCircle },
   { title: "Fluxo de Caixa", url: "/financeiro/fluxo-caixa", icon: TrendingUp },
   { title: "Categorias", url: "/financeiro/categorias", icon: Tags },
+  { title: "Centros de Custo", url: "/centros-de-custo", icon: Building2 },
   { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
   { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
@@ -55,6 +58,7 @@ const vendasItems = [
   { title: "Pedidos", url: "/vendas/pedidos", icon: ShoppingCart },
   { title: "Produtos", url: "/vendas/produtos", icon: Package },
 ];
+
 
 export function AppSidebar() {
   const { state } = useSidebar();
