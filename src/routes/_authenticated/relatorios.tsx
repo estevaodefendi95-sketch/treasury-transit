@@ -244,8 +244,8 @@ function DRETab() {
                 const v = variance(a, b);
                 const isOpen = expanded.has(id);
                 return (
-                  <>
-                    <TableRow key={id} className="cursor-pointer hover:bg-muted/30" onClick={() => toggleExpand(id)}>
+                  <Fragment key={id}>
+                    <TableRow className="cursor-pointer hover:bg-muted/30" onClick={() => toggleExpand(id)}>
                       <TableCell className="pl-6 flex items-center gap-1">
                         {isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                         {c?.icon} {c?.name ?? "Sem categoria"}
@@ -265,7 +265,7 @@ function DRETab() {
                         <TableCell colSpan={2}></TableCell>
                       </TableRow>
                     ))}
-                  </>
+                  </Fragment>
                 );
               })}
               <TableRow className="font-semibold border-t-2">
@@ -288,8 +288,8 @@ function DRETab() {
                 const v = variance(a, b);
                 const isOpen = expanded.has(id + "_exp");
                 return (
-                  <>
-                    <TableRow key={id + "_exp"} className="cursor-pointer hover:bg-muted/30" onClick={() => toggleExpand(id + "_exp")}>
+                  <Fragment key={id + "_exp"}>
+                    <TableRow className="cursor-pointer hover:bg-muted/30" onClick={() => toggleExpand(id + "_exp")}>
                       <TableCell className="pl-6 flex items-center gap-1">
                         {isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                         {c?.icon} {c?.name ?? "Sem categoria"}
@@ -309,7 +309,7 @@ function DRETab() {
                         <TableCell colSpan={2}></TableCell>
                       </TableRow>
                     ))}
-                  </>
+                  </Fragment>
                 );
               })}
               <TableRow className="font-semibold border-t-2">
@@ -846,8 +846,8 @@ function CentroTab() {
                 <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-6">Sem centros de custo</TableCell></TableRow>
               )}
               {data.map((r) => (
-                <>
-                  <TableRow key={r.id} className="cursor-pointer hover:bg-muted/30" onClick={() => setDrill(drill === r.id ? null : r.id)}>
+                <Fragment key={r.id}>
+                  <TableRow className="cursor-pointer hover:bg-muted/30" onClick={() => setDrill(drill === r.id ? null : r.id)}>
                     <TableCell className="flex items-center gap-2">
                       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: r.color }} />
                       {r.name}
@@ -866,7 +866,7 @@ function CentroTab() {
                       <TableCell></TableCell>
                     </TableRow>
                   ))}
-                </>
+                </Fragment>
               ))}
             </TableBody>
           </Table>
