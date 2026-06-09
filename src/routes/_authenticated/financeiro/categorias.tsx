@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
@@ -197,7 +198,9 @@ function CategoriasPage() {
           <Card key={g.type}>
             <CardHeader><CardTitle className="text-base">{g.title} ({items.length})</CardTitle></CardHeader>
             <CardContent>
-              {items.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma categoria.</p>}
+              {items.length === 0 && (
+                <EmptyState icon="🏷️" title="Nenhuma categoria" description="Organize seus lançamentos por categoria" />
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {items.map((c) => {
                   const spent = monthlySpent.get(c.id) ?? 0;

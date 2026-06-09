@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -150,10 +151,7 @@ function NotificacoesPage() {
         </CardHeader>
         <CardContent className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="h-10 w-10 mx-auto mb-2 opacity-30" />
-              <div className="text-sm">Nenhuma notificação</div>
-            </div>
+            <EmptyState icon="✅" title="Tudo em dia!" description="Você não tem notificações no momento" />
           ) : (
             <ul className="divide-y">
               {filtered.map((n: AppNotification) => {

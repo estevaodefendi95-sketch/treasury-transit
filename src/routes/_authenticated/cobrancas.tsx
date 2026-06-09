@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -197,9 +198,7 @@ function CobrancasPage() {
         </CardHeader>
         <CardContent className="p-0">
           {rows.length === 0 ? (
-            <div className="p-8 text-sm text-muted-foreground text-center">
-              🎉 Nenhuma cobrança pendente.
-            </div>
+            <EmptyState icon="🎉" title="Nenhuma cobrança pendente" description="Todos os recebíveis estão em dia!" />
           ) : (
             <Table>
               <TableHeader>

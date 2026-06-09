@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -196,9 +197,8 @@ function AprovacoesPage() {
             <TableBody>
               {pending.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-12">
-                    <Check className="h-8 w-8 mx-auto mb-2 text-emerald-500 opacity-50" />
-                    Nenhum lançamento pendente
+                  <TableCell colSpan={7}>
+                    <EmptyState icon="✅" title="Nenhuma aprovação pendente" description="Todos os lançamentos foram processados" />
                   </TableCell>
                 </TableRow>
               )}

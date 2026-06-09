@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/empty-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -125,7 +126,9 @@ function ContasReceberPage() {
             </TableHeader>
             <TableBody>
               {contas.length === 0 && (
-                <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">Nenhuma conta cadastrada</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5}>
+                  <EmptyState icon="📥" title="Nenhuma conta a receber" description="Suas receitas agendadas aparecerão aqui" actionLabel="Adicionar receita" actionHref="/financeiro/transacoes" />
+                </TableCell></TableRow>
               )}
               {contas.map((c) => {
                 const overdue = isOverdue(c);
