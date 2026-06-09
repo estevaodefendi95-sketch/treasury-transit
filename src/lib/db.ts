@@ -17,7 +17,13 @@ export type Company = {
   state?: string | null;
   zip_code?: string | null;
   logo_url?: string | null;
+  locked_until?: string | null;
 };
+
+export function isDateLocked(date: string | null | undefined, lockedUntil: string | null | undefined): boolean {
+  if (!date || !lockedUntil) return false;
+  return date <= lockedUntil;
+}
 
 export type Profile = {
   id: string;
