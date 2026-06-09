@@ -182,19 +182,26 @@ export async function createCompanyAndLink(input: {
   name: string;
   cnpj?: string;
 }): Promise<Company> {
-  // 1) cria empresa
-  const { data: comp, error: e1 } = await supabase
+  const companyId = crypto.randomUUID();
+  const company: Company = {
+    id: companyId,
+    name: input.name,
+    cnpj: input.cnpj || null,
+    email: input.email,
+  };
+
+  // 1) cria empresa sem RETURNING: a policy de SELECT depende do profile,
+  // que só é vinculado no passo seguinte.
+  const { error: e1 } = await supabase
     .from("companies")
-    .insert({ name: input.name, cnpj: input.cnpj || null, email: input.email })
-    .select()
-    .single();
+    .insert(company);
   if (e1) throw e1;
 
   // 2) upsert profile (linka usuário à empresa)
   const { error: e2 } = await supabase.from("profiles").upsert(
     {
       id: input.userId,
-      company_id: comp.id,
+      company_id: companyId,
       full_name: input.fullName,
       email: input.email,
       role: "owner",
@@ -204,9 +211,9 @@ export async function createCompanyAndLink(input: {
   if (e2) throw e2;
 
   // 3) semeia categorias padrão
-  await seedDefaultCategories(comp.id);
+  await seedDefaultCategories(companyId);
 
-  return comp as Company;
+  return company;
 }
 
 // ---------- Categorias padrão (semeadas no onboarding) ----------
