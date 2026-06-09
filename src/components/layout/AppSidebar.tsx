@@ -121,6 +121,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/projecao")}>
+                  <Link to="/projecao">
+                    <Sparkles className="h-4 w-4" />
+                    {!collapsed && <span>Projeção IA</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {isAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith("/aprovacoes")}>
