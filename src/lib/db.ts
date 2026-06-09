@@ -56,6 +56,10 @@ export type Transaction = {
   recurrence_group_id: string | null;
   approval_status: string | null;
   is_reconciled: boolean | null;
+  original_description?: string | null;
+  edited_description?: string | null;
+  category_auto_applied?: boolean | null;
+  bank_statement_import_id?: string | null;
   created_at?: string;
 };
 
