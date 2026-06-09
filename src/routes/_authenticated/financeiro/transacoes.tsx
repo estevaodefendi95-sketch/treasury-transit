@@ -33,6 +33,10 @@ import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
 import { AttachmentField, AttachmentBadge } from "@/components/financeiro/AttachmentField";
 import { Checkbox } from "@/components/ui/checkbox";
+import { approvalLimitsQuery, computeApprovalStatus, notifyAdminsPendingApproval } from "@/lib/approvals";
+import { ApprovalTimeline } from "@/routes/_authenticated/aprovacoes";
+import { approvalLogsQuery } from "@/lib/approvals";
+import { Clock } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
