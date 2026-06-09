@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useNotificationGenerator } from "@/hooks/useNotificationGenerator";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const logout = useAuthStore((s) => s.logout);
@@ -55,6 +56,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <main className="flex-1 p-4 md:p-6 overflow-auto pb-20 md:pb-6">{children}</main>
         </div>
         <MobileBottomNav />
+        <KeyboardShortcuts />
       </div>
     </SidebarProvider>
   );
