@@ -44,7 +44,7 @@ const financeiroItems = [
   { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
   { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
-] as const;
+];
 
 const vendasItems = [
   { title: "Clientes", url: "/vendas/clientes", icon: Users },
