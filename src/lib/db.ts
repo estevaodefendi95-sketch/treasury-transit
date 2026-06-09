@@ -96,6 +96,9 @@ export type Category = {
   type: string | null;
   color: string | null;
   icon: string | null;
+  parent_id: string | null;
+  monthly_budget: number | null;
+  is_active: boolean | null;
 };
 
 export type BankAccount = {
