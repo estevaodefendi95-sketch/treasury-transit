@@ -56,6 +56,26 @@ function DashboardPage() {
         <div className="text-sm text-muted-foreground">Carregando…</div>
       ) : (
         <>
+          {isAdmin && pendingApprovals.length > 0 && (
+            <Card className="border-amber-300 bg-amber-50">
+              <CardContent className="pt-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <ClipboardCheck className="h-6 w-6 text-amber-700" />
+                  <div>
+                    <div className="font-semibold text-amber-900">
+                      {pendingApprovals.length} lançamento{pendingApprovals.length !== 1 ? "s" : ""} aguardando aprovação
+                    </div>
+                    <div className="text-xs text-amber-800">
+                      Total: {formatBRL(pendingApprovals.reduce((s, t) => s + Number(t.amount), 0))}
+                    </div>
+                  </div>
+                </div>
+                <Button asChild variant="default" size="sm" className="bg-amber-600 hover:bg-amber-700">
+                  <Link to="/aprovacoes">Revisar fila</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {kpis.map((k) => (
               <Card key={k.label} className="overflow-hidden">
