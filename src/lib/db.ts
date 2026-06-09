@@ -364,6 +364,13 @@ export const bankAccountsQuery = (companyId: string | null | undefined) =>
     enabled: !!companyId,
   });
 
+export const creditCardsQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["credit_cards", companyId],
+    queryFn: () => (companyId ? fetchCreditCards(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
 export const salesOrdersQuery = (companyId: string | null | undefined) =>
   queryOptions({
     queryKey: ["sales_orders", companyId],
