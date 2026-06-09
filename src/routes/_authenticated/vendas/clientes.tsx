@@ -114,7 +114,9 @@ function ClientesPage() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-6">Nenhum cliente</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4}>
+                  <EmptyState icon="👥" title="Nenhum cliente cadastrado" description="Cadastre clientes para vincular às cobranças" />
+                </TableCell></TableRow>
               )}
               {filtered.map((c) => (
                 <TableRow key={c.id}>

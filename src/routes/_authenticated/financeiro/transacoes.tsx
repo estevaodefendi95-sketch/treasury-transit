@@ -399,7 +399,9 @@ function TransacoesPage() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-6">Nenhuma transação</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7}>
+                  <EmptyState icon="📋" title="Nenhum lançamento ainda" description="Registre suas receitas e despesas para começar" />
+                </TableCell></TableRow>
               )}
               {filtered.map((t) => {
                 const cat = catById(t.category_id);

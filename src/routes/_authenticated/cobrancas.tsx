@@ -197,9 +197,7 @@ function CobrancasPage() {
         </CardHeader>
         <CardContent className="p-0">
           {rows.length === 0 ? (
-            <div className="p-8 text-sm text-muted-foreground text-center">
-              🎉 Nenhuma cobrança pendente.
-            </div>
+            <EmptyState icon="🎉" title="Nenhuma cobrança pendente" description="Todos os recebíveis estão em dia!" />
           ) : (
             <Table>
               <TableHeader>

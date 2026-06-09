@@ -125,7 +125,9 @@ function ContasPagarPage() {
             </TableHeader>
             <TableBody>
               {contas.length === 0 && (
-                <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">Nenhuma conta cadastrada</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5}>
+                  <EmptyState icon="📤" title="Nenhuma conta a pagar" description="Suas despesas agendadas aparecerão aqui" actionLabel="Adicionar despesa" actionHref="/financeiro/transacoes" />
+                </TableCell></TableRow>
               )}
               {contas.map((c) => {
                 const overdue = isOverdue(c);
