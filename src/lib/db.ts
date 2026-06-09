@@ -127,7 +127,23 @@ export type BankAccount = {
   agency: string | null;
   account_number: string | null;
   balance: number | null;
+  initial_balance?: number | null;
+  minimum_balance?: number | null;
+  color?: string | null;
   is_active: boolean | null;
+};
+
+export type CreditCard = {
+  id: string;
+  company_id: string;
+  name: string;
+  brand: string | null;
+  last_four_digits: string | null;
+  credit_limit: number | null;
+  closing_day: number | null;
+  due_day: number | null;
+  color: string | null;
+  is_active?: boolean | null;
 };
 
 export type SalesOrder = {
@@ -302,6 +318,7 @@ export const fetchSuppliers = listByCompany<Supplier>("suppliers");
 export const fetchProducts = listByCompany<Product>("products");
 export const fetchCategories = listByCompany<Category>("categories");
 export const fetchBankAccounts = listByCompany<BankAccount>("bank_accounts");
+export const fetchCreditCards = listByCompany<CreditCard>("credit_cards");
 export const fetchSalesOrders = listByCompany<SalesOrder>("sales_orders");
 export const fetchBankStatements = listByCompany<BankStatement>("bank_statements");
 
@@ -344,6 +361,13 @@ export const bankAccountsQuery = (companyId: string | null | undefined) =>
   queryOptions({
     queryKey: ["bank_accounts", companyId],
     queryFn: () => (companyId ? fetchBankAccounts(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export const creditCardsQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["credit_cards", companyId],
+    queryFn: () => (companyId ? fetchCreditCards(companyId) : Promise.resolve([])),
     enabled: !!companyId,
   });
 

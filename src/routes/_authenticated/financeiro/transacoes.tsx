@@ -24,6 +24,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { PaymentMethodFields, emptyPaymentFields, type PaymentFields } from "@/components/financeiro/PaymentMethodFields";
 import { PaymentMethodBadge, PaymentMethodDetails, PixReceiveBox } from "@/components/financeiro/PaymentMethodBadge";
 import { RecurrenceSelect, RecurrenceBadge } from "@/components/financeiro/RecurrenceSelect";
+import { AccountFilter, isTransferType } from "@/components/financeiro/AccountFilter";
+import { bankAccountsQuery } from "@/lib/db";
+import { ArrowRightLeft } from "lucide-react";
 import { RecurrenceScopeModal } from "@/components/financeiro/RecurrenceScopeModal";
 import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
@@ -40,10 +43,12 @@ function TransacoesPage() {
   const { data: transacoes = [] } = useQuery(transactionsQuery(companyId));
   const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
+  const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
   const categorize = useServerFn(categorizeTransaction);
   const learnName = useServerFn(learnNameRule);
 
   const [filter, setFilter] = useState("");
+  const [accountFilter, setAccountFilter] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     type: "expense" as "income" | "expense",
@@ -62,9 +67,11 @@ function TransacoesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
 
-  const filtered = transacoes.filter((t) =>
-    t.description.toLowerCase().includes(filter.toLowerCase()),
-  );
+  const filtered = transacoes.filter((t) => {
+    if (!t.description.toLowerCase().includes(filter.toLowerCase())) return false;
+    if (accountFilter && t.bank_account_id !== accountFilter) return false;
+    return true;
+  });
 
   useEffect(() => {
     setSuggestion(null);
@@ -305,9 +312,12 @@ function TransacoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Histórico</CardTitle>
-          <div className="relative mt-2">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-8" placeholder="Buscar..." value={filter} onChange={(e) => setFilter(e.target.value)} />
+          <div className="flex gap-2 mt-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-8" placeholder="Buscar..." value={filter} onChange={(e) => setFilter(e.target.value)} />
+            </div>
+            <AccountFilter accounts={bankAccounts} value={accountFilter} onChange={setAccountFilter} />
           </div>
         </CardHeader>
         <CardContent>
@@ -349,6 +359,7 @@ function TransacoesPage() {
                         ) : (
                           <div>
                             <div className="font-medium flex items-center gap-1 flex-wrap">
+                              {isTransferType(t.type) && <ArrowRightLeft className="h-3 w-3 text-cyan-600" />}
                               {t.description}
                               <RecurrenceBadge tx={t} />
                               <button onClick={() => startEdit(t)}
