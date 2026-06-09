@@ -26,7 +26,9 @@ export type Profile = {
   email: string | null;
   role: string | null;
   avatar_url: string | null;
+  notification_preferences?: Record<string, boolean> | null;
 };
+
 
 export type TxType = "income" | "expense";
 export type TxStatus = "pending" | "paid" | "received" | "overdue" | "canceled" | "scheduled";
