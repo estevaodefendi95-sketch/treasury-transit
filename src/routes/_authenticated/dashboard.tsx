@@ -1,126 +1,125 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useAppStore, formatBRL } from "@/store/useStore";
 import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
+import { useCurrentCompany } from "@/hooks/useCurrentCompany";
+import { transactionsQuery, formatBRL, isOverdue, type Transaction } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  ssr: false,
   head: () => ({ meta: [{ title: "Dashboard — SuaEmpresa Gestão" }] }),
   component: DashboardPage,
 });
 
 function DashboardPage() {
-  const { transacoes, contasPagar, contasReceber } = useAppStore();
+  const { companyId } = useCurrentCompany();
+  const { data: transacoes = [], isLoading } = useQuery(transactionsQuery(companyId));
 
-  const receitas = transacoes.filter((t) => t.tipo === "receita").reduce((s, t) => s + t.valor, 0);
-  const despesas = transacoes.filter((t) => t.tipo === "despesa").reduce((s, t) => s + t.valor, 0);
+  const receitas = transacoes.filter((t) => t.type === "income" && (t.status === "received" || t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
+  const despesas = transacoes.filter((t) => t.type === "expense" && (t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
   const saldo = receitas - despesas;
-  const aPagar = contasPagar.filter((c) => c.status !== "pago").reduce((s, c) => s + c.valor, 0);
-  const aReceber = contasReceber.filter((c) => c.status !== "recebido").reduce((s, c) => s + c.valor, 0);
-  const atrasados = [...contasPagar, ...contasReceber].filter((c) => c.status === "atrasado").length;
+  const aPagar = transacoes.filter((t) => t.type === "expense" && t.status !== "paid" && t.status !== "canceled").reduce((s, t) => s + Number(t.amount), 0);
+  const aReceber = transacoes.filter((t) => t.type === "income" && t.status !== "received" && t.status !== "paid" && t.status !== "canceled").reduce((s, t) => s + Number(t.amount), 0);
+  const atrasados = transacoes.filter(isOverdue).length;
 
-  // Agrupar por dia para o gráfico
-  const porDia = transacoes.reduce<Record<string, { dia: string; receita: number; despesa: number }>>(
-    (acc, t) => {
-      const dia = t.data.slice(8, 10) + "/" + t.data.slice(5, 7);
-      if (!acc[dia]) acc[dia] = { dia, receita: 0, despesa: 0 };
-      if (t.tipo === "receita") acc[dia].receita += t.valor;
-      else acc[dia].despesa += t.valor;
-      return acc;
-    },
-    {}
-  );
-  const chartData = Object.values(porDia).sort((a, b) => a.dia.localeCompare(b.dia));
+  // Agrupar por dia (últimos 30 dias) para o gráfico
+  const porDia = transacoes.reduce<Record<string, { dia: string; receita: number; despesa: number }>>((acc, t: Transaction) => {
+    const ref = t.payment_date ?? t.due_date;
+    if (!ref) return acc;
+    const dia = ref.slice(8, 10) + "/" + ref.slice(5, 7);
+    if (!acc[dia]) acc[dia] = { dia, receita: 0, despesa: 0 };
+    if (t.type === "income") acc[dia].receita += Number(t.amount);
+    else if (t.type === "expense") acc[dia].despesa += Number(t.amount);
+    return acc;
+  }, {});
+  const chartData = Object.values(porDia).sort((a, b) => a.dia.localeCompare(b.dia)).slice(-14);
 
-  const cards = [
-    { label: "Saldo Atual", value: saldo, icon: Wallet, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Receitas", value: receitas, icon: ArrowDownRight, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
-    { label: "Despesas", value: despesas, icon: ArrowUpRight, color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-500/10" },
-    { label: "A Pagar", value: aPagar, icon: AlertCircle, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10" },
+  const kpis = [
+    { label: "Receitas (realizadas)", value: receitas, icon: ArrowDownRight, tone: "text-emerald-600" },
+    { label: "Despesas (realizadas)", value: despesas, icon: ArrowUpRight, tone: "text-rose-600" },
+    { label: "Saldo", value: saldo, icon: Wallet, tone: saldo >= 0 ? "text-emerald-600" : "text-rose-600" },
+    { label: "A receber", value: aReceber, icon: ArrowDownRight, tone: "text-sky-600" },
+    { label: "A pagar", value: aPagar, icon: ArrowUpRight, tone: "text-amber-600" },
+    { label: "Atrasados", value: atrasados, icon: AlertCircle, tone: "text-rose-600", count: true },
   ];
 
   return (
-    <>
-      <PageHeader title="Dashboard" description="Visão geral financeira da sua empresa." />
+    <div className="space-y-6">
+      <PageHeader title="Dashboard" description="Visão geral financeira da empresa." />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {cards.map((c) => (
-          <Card key={c.label}>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{c.label}</p>
-                  <p className="text-2xl font-bold mt-1 text-foreground">{formatBRL(c.value)}</p>
-                </div>
-                <div className={`h-10 w-10 rounded-lg ${c.bg} flex items-center justify-center`}>
-                  <c.icon className={`h-5 w-5 ${c.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">Receitas vs Despesas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="dia" className="text-xs" />
-                  <YAxis className="text-xs" tickFormatter={(v) => `R$${v / 1000}k`} />
-                  <Tooltip formatter={(v: number) => formatBRL(v)} />
-                  <Legend />
-                  <Bar dataKey="receita" fill="hsl(142 76% 40%)" name="Receita" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="despesa" fill="hsl(0 70% 55%)" name="Despesa" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">A Receber</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{formatBRL(aReceber)}</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {contasReceber.filter((c) => c.status !== "recebido").length} contas pendentes
-            </p>
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">Itens atrasados</p>
-              <p className="text-xl font-semibold text-rose-600 dark:text-rose-400">{atrasados}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Últimas transações</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {transacoes.slice(0, 6).map((t) => (
-              <div key={t.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t.descricao}</p>
-                  <p className="text-xs text-muted-foreground">{t.categoria} · {t.data}</p>
-                </div>
-                <p className={`text-sm font-semibold ${t.tipo === "receita" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                  {t.tipo === "receita" ? "+" : "-"} {formatBRL(t.valor)}
-                </p>
-              </div>
+      {isLoading ? (
+        <div className="text-sm text-muted-foreground">Carregando…</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {kpis.map((k) => (
+              <Card key={k.label} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{k.label}</span>
+                    <k.icon className={`h-4 w-4 ${k.tone}`} />
+                  </div>
+                  <div className={`text-lg font-bold mt-1 ${k.tone}`}>
+                    {k.count ? k.value : formatBRL(k.value)}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </CardContent>
-      </Card>
-    </>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Receitas vs Despesas (últimos 14 dias)</CardTitle>
+            </CardHeader>
+            <CardContent className="h-64">
+              {chartData.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                  Sem dados de transações ainda. Cadastre na seção Financeiro.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="dia" fontSize={11} />
+                    <YAxis fontSize={11} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(v: number) => formatBRL(v)} />
+                    <Legend />
+                    <Bar dataKey="receita" name="Receita" fill="hsl(142, 76%, 36%)" />
+                    <Bar dataKey="despesa" name="Despesa" fill="hsl(0, 72%, 51%)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Tendência de saldo acumulado</CardTitle>
+            </CardHeader>
+            <CardContent className="h-56">
+              {chartData.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-sm text-muted-foreground">—</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData.reduce<Array<{ dia: string; saldo: number }>>((acc, c, i) => {
+                    const prev = i > 0 ? acc[i - 1].saldo : 0;
+                    acc.push({ dia: c.dia, saldo: prev + c.receita - c.despesa });
+                    return acc;
+                  }, [])}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="dia" fontSize={11} />
+                    <YAxis fontSize={11} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(v: number) => formatBRL(v)} />
+                    <Line type="monotone" dataKey="saldo" stroke="hsl(217, 91%, 60%)" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </div>
   );
 }

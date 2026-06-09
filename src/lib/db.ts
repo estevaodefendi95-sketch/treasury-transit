@@ -297,7 +297,8 @@ export async function insertRow<T extends Record<string, unknown>>(
   table: string,
   values: T,
 ): Promise<T> {
-  const { data, error } = await supabase.from(table).insert(values).select().single();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from(table).insert(values as any).select().single();
   if (error) throw error;
   return data as T;
 }
@@ -307,10 +308,12 @@ export async function updateRow<T extends Record<string, unknown>>(
   id: string,
   values: Partial<T>,
 ): Promise<T> {
-  const { data, error } = await supabase.from(table).update(values).eq("id", id).select().single();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from(table).update(values as any).eq("id", id).select().single();
   if (error) throw error;
   return data as T;
 }
+
 
 export async function deleteRow(table: string, id: string): Promise<void> {
   const { error } = await supabase.from(table).delete().eq("id", id);
