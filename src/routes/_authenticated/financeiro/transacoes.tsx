@@ -359,6 +359,7 @@ function TransacoesPage() {
                         ) : (
                           <div>
                             <div className="font-medium flex items-center gap-1 flex-wrap">
+                              {isTransferType(t.type) && <ArrowRightLeft className="h-3 w-3 text-cyan-600" />}
                               {t.description}
                               <RecurrenceBadge tx={t} />
                               <button onClick={() => startEdit(t)}
