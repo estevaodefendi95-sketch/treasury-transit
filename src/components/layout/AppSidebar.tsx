@@ -131,6 +131,21 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/orcamento")}>
+                  <Link to="/orcamento">
+                    <Target className="h-4 w-4" />
+                    {!collapsed && <span>Orçamento</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/cobrancas")}>
+                  <Link to="/cobrancas">
+                    <Receipt className="h-4 w-4" />
+                    {!collapsed && <span>Cobranças</span>}
+                  </Link>
+                </SidebarMenuButton>
               {isAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith("/aprovacoes")}>
