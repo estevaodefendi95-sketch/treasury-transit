@@ -13,7 +13,10 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCentrosDeCustoRouteRouteImport } from './routes/_authenticated/centros-de-custo/route'
+import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
 import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
 import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
 import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
@@ -28,6 +31,8 @@ import { Route as AuthenticatedFinanceiroConciliacaoRouteImport } from './routes
 import { Route as AuthenticatedFinanceiroCategoriasRouteImport } from './routes/_authenticated/financeiro/categorias'
 import { Route as AuthenticatedFinanceiroCartoesRouteImport } from './routes/_authenticated/financeiro/cartoes'
 import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
+import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './routes/_authenticated/configuracoes/notificacoes'
+import { Route as AuthenticatedCentrosDeCustoRelatorioRouteImport } from './routes/_authenticated/centros-de-custo/relatorio'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -48,11 +53,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedNotificacoesRoute =
+  AuthenticatedNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCentrosDeCustoRouteRoute =
+  AuthenticatedCentrosDeCustoRouteRouteImport.update({
+    id: '/centros-de-custo',
+    path: '/centros-de-custo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCentrosDeCustoIndexRoute =
+  AuthenticatedCentrosDeCustoIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedCentrosDeCustoRouteRoute,
+  } as any)
 const AuthenticatedVendasProdutosRoute =
   AuthenticatedVendasProdutosRouteImport.update({
     id: '/vendas/produtos',
@@ -137,12 +160,28 @@ const AuthenticatedFinanceiroCalendarioRoute =
     path: '/financeiro/calendario',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConfiguracoesNotificacoesRoute =
+  AuthenticatedConfiguracoesNotificacoesRouteImport.update({
+    id: '/configuracoes/notificacoes',
+    path: '/configuracoes/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCentrosDeCustoRelatorioRoute =
+  AuthenticatedCentrosDeCustoRelatorioRouteImport.update({
+    id: '/relatorio',
+    path: '/relatorio',
+    getParentRoute: () => AuthenticatedCentrosDeCustoRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
+  '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -157,12 +196,16 @@ export interface FileRoutesByFullPath {
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
+  '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -177,6 +220,7 @@ export interface FileRoutesByTo {
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -184,7 +228,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/_authenticated/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
+  '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/_authenticated/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/_authenticated/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -199,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/_authenticated/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/_authenticated/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
+  '/_authenticated/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -206,7 +255,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/centros-de-custo'
     | '/dashboard'
+    | '/notificacoes'
+    | '/centros-de-custo/relatorio'
+    | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
     | '/financeiro/categorias'
@@ -221,12 +274,16 @@ export interface FileRouteTypes {
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
+    | '/centros-de-custo/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/onboarding'
     | '/dashboard'
+    | '/notificacoes'
+    | '/centros-de-custo/relatorio'
+    | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
     | '/financeiro/categorias'
@@ -241,13 +298,18 @@ export interface FileRouteTypes {
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
+    | '/centros-de-custo'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/onboarding'
+    | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
+    | '/_authenticated/notificacoes'
+    | '/_authenticated/centros-de-custo/relatorio'
+    | '/_authenticated/configuracoes/notificacoes'
     | '/_authenticated/financeiro/calendario'
     | '/_authenticated/financeiro/cartoes'
     | '/_authenticated/financeiro/categorias'
@@ -262,6 +324,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vendas/clientes'
     | '/_authenticated/vendas/pedidos'
     | '/_authenticated/vendas/produtos'
+    | '/_authenticated/centros-de-custo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -301,12 +364,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/notificacoes': {
+      id: '/_authenticated/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centros-de-custo': {
+      id: '/_authenticated/centros-de-custo'
+      path: '/centros-de-custo'
+      fullPath: '/centros-de-custo'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centros-de-custo/': {
+      id: '/_authenticated/centros-de-custo/'
+      path: '/'
+      fullPath: '/centros-de-custo/'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoIndexRouteImport
+      parentRoute: typeof AuthenticatedCentrosDeCustoRouteRoute
     }
     '/_authenticated/vendas/produtos': {
       id: '/_authenticated/vendas/produtos'
@@ -406,11 +490,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroCalendarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/configuracoes/notificacoes': {
+      id: '/_authenticated/configuracoes/notificacoes'
+      path: '/configuracoes/notificacoes'
+      fullPath: '/configuracoes/notificacoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centros-de-custo/relatorio': {
+      id: '/_authenticated/centros-de-custo/relatorio'
+      path: '/relatorio'
+      fullPath: '/centros-de-custo/relatorio'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoRelatorioRouteImport
+      parentRoute: typeof AuthenticatedCentrosDeCustoRouteRoute
+    }
   }
 }
 
+interface AuthenticatedCentrosDeCustoRouteRouteChildren {
+  AuthenticatedCentrosDeCustoRelatorioRoute: typeof AuthenticatedCentrosDeCustoRelatorioRoute
+  AuthenticatedCentrosDeCustoIndexRoute: typeof AuthenticatedCentrosDeCustoIndexRoute
+}
+
+const AuthenticatedCentrosDeCustoRouteRouteChildren: AuthenticatedCentrosDeCustoRouteRouteChildren =
+  {
+    AuthenticatedCentrosDeCustoRelatorioRoute:
+      AuthenticatedCentrosDeCustoRelatorioRoute,
+    AuthenticatedCentrosDeCustoIndexRoute:
+      AuthenticatedCentrosDeCustoIndexRoute,
+  }
+
+const AuthenticatedCentrosDeCustoRouteRouteWithChildren =
+  AuthenticatedCentrosDeCustoRouteRoute._addFileChildren(
+    AuthenticatedCentrosDeCustoRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCentrosDeCustoRouteRoute: typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
+  AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
   AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
   AuthenticatedFinanceiroCartoesRoute: typeof AuthenticatedFinanceiroCartoesRoute
   AuthenticatedFinanceiroCategoriasRoute: typeof AuthenticatedFinanceiroCategoriasRoute
@@ -428,7 +547,12 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCentrosDeCustoRouteRoute:
+    AuthenticatedCentrosDeCustoRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
+  AuthenticatedConfiguracoesNotificacoesRoute:
+    AuthenticatedConfiguracoesNotificacoesRoute,
   AuthenticatedFinanceiroCalendarioRoute:
     AuthenticatedFinanceiroCalendarioRoute,
   AuthenticatedFinanceiroCartoesRoute: AuthenticatedFinanceiroCartoesRoute,

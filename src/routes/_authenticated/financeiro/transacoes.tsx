@@ -18,6 +18,7 @@ import {
   updateRow,
   formatBRL, formatDateBR, statusLabel, todayISO,
   type Transaction,
+  costCentersQuery,
 } from "@/lib/db";
 import { categorizeTransaction, learnNameRule } from "@/lib/ai.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,9 @@ import { ArrowRightLeft } from "lucide-react";
 import { RecurrenceScopeModal } from "@/components/financeiro/RecurrenceScopeModal";
 import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
+import { AttachmentField, AttachmentBadge } from "@/components/financeiro/AttachmentField";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
   ssr: false,
@@ -44,19 +48,24 @@ function TransacoesPage() {
   const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
   const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
+  const { data: costCenters = [] } = useQuery(costCentersQuery(companyId));
   const categorize = useServerFn(categorizeTransaction);
   const learnName = useServerFn(learnNameRule);
 
   const [filter, setFilter] = useState("");
   const [accountFilter, setAccountFilter] = useState("");
+  const [onlyMissingAttachment, setOnlyMissingAttachment] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     type: "expense" as "income" | "expense",
     description: "", amount: "", due_date: todayISO(),
     category_id: "" as string | null,
+    cost_center_id: "" as string | null,
     recurrence: "unico" as Recurrence,
   });
   const [payment, setPayment] = useState<PaymentFields>(emptyPaymentFields);
+  const [pendingAttachment, setPendingAttachment] = useState<string | null>(null);
+  const [pendingDraftId] = useState(() => crypto.randomUUID());
   const [suggesting, setSuggesting] = useState(false);
   const [suggestion, setSuggestion] = useState<{ category_id: string | null; category_name: string | null; confidence: number; reason: string } | null>(null);
   const [autoApplied, setAutoApplied] = useState(false);
@@ -70,8 +79,10 @@ function TransacoesPage() {
   const filtered = transacoes.filter((t) => {
     if (!t.description.toLowerCase().includes(filter.toLowerCase())) return false;
     if (accountFilter && t.bank_account_id !== accountFilter) return false;
+    if (onlyMissingAttachment && t.attachment_url) return false;
     return true;
   });
+
 
   useEffect(() => {
     setSuggestion(null);
@@ -115,8 +126,9 @@ function TransacoesPage() {
   };
 
   const resetForm = () => {
-    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", recurrence: "unico" });
+    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", cost_center_id: "", recurrence: "unico" });
     setPayment(emptyPaymentFields);
+    setPendingAttachment(null);
     setSuggestion(null);
     setAutoApplied(false);
   };
@@ -134,8 +146,10 @@ function TransacoesPage() {
         amount,
         due_date: form.due_date,
         category_id: form.category_id || null,
+        cost_center_id: form.cost_center_id || null,
         category_auto_applied: autoApplied,
         payment_method: payment.payment_method || null,
+        attachment_url: pendingAttachment,
         // PIX
         pix_key_type: payment.pix_key_type || null,
         pix_key: payment.pix_key || null,
@@ -149,6 +163,7 @@ function TransacoesPage() {
         card_installments: installments > 1 ? installments : null,
         card_invoice_date: payment.card_invoice_date || null,
       };
+
       const count = await createTransactionSeries(base, {
         recurrence: form.recurrence,
         installments,
@@ -296,10 +311,32 @@ function TransacoesPage() {
 
                 <PaymentMethodFields value={payment} amount={amountNum} onChange={setPayment} />
 
+                <div className="space-y-2">
+                  <Label>Centro de custo (opcional)</Label>
+                  <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    value={form.cost_center_id ?? ""}
+                    onChange={(e) => setForm({ ...form, cost_center_id: e.target.value })}>
+                    <option value="">— Nenhum —</option>
+                    {costCenters.filter((c) => c.is_active).map((c) => (
+                      <option key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
                 <RecurrenceSelect
                   value={form.recurrence}
                   onChange={(r) => setForm({ ...form, recurrence: r })}
                 />
+
+                <div className="space-y-2">
+                  <Label>Comprovante</Label>
+                  <AttachmentField
+                    companyId={companyId}
+                    recordId={pendingDraftId}
+                    value={pendingAttachment}
+                    onChange={setPendingAttachment}
+                  />
+                </div>
 
                 <Button onClick={() => create.mutate()} disabled={create.isPending || !form.description || !form.amount} className="w-full">
                   {create.isPending ? "Salvando..." : "Criar"}
@@ -312,14 +349,22 @@ function TransacoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Histórico</CardTitle>
-          <div className="flex gap-2 mt-2">
-            <div className="relative flex-1">
+          <div className="flex flex-wrap gap-2 mt-2 items-center">
+            <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input className="pl-8" placeholder="Buscar..." value={filter} onChange={(e) => setFilter(e.target.value)} />
             </div>
             <AccountFilter accounts={bankAccounts} value={accountFilter} onChange={setAccountFilter} />
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+              <Checkbox
+                checked={onlyMissingAttachment}
+                onCheckedChange={(v) => setOnlyMissingAttachment(!!v)}
+              />
+              Sem comprovante
+            </label>
           </div>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -362,11 +407,13 @@ function TransacoesPage() {
                               {isTransferType(t.type) && <ArrowRightLeft className="h-3 w-3 text-cyan-600" />}
                               {t.description}
                               <RecurrenceBadge tx={t} />
+                              <AttachmentBadge path={t.attachment_url} />
                               <button onClick={() => startEdit(t)}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                               </button>
                             </div>
+
                             {t.original_description && t.original_description !== t.description && (
                               <div className="text-[10px] text-muted-foreground italic">{t.original_description}</div>
                             )}
