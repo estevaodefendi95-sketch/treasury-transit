@@ -67,9 +67,11 @@ function TransacoesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
 
-  const filtered = transacoes.filter((t) =>
-    t.description.toLowerCase().includes(filter.toLowerCase()),
-  );
+  const filtered = transacoes.filter((t) => {
+    if (!t.description.toLowerCase().includes(filter.toLowerCase())) return false;
+    if (accountFilter && t.bank_account_id !== accountFilter) return false;
+    return true;
+  });
 
   useEffect(() => {
     setSuggestion(null);
