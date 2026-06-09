@@ -5,16 +5,23 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useStore";
 import { useNavigate } from "@tanstack/react-router";
+import { useCurrentCompany } from "@/hooks/useCurrentCompany";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { user, empresa, logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { user, profile, company } = useCurrentCompany();
 
   const handleLogout = async () => {
+    await qc.cancelQueries();
+    qc.clear();
     await logout();
-    navigate({ to: "/auth" });
+    navigate({ to: "/auth", replace: true });
   };
 
+  const displayName = profile?.full_name ?? user?.email ?? "";
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -25,14 +32,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <SidebarTrigger />
               <div className="hidden md:flex flex-col">
                 <span className="text-sm font-semibold text-foreground">
-                  {empresa?.nome ?? "SuaEmpresa Gestão"}
+                  {company?.name ?? "SuaEmpresa Gestão"}
                 </span>
                 <span className="text-[11px] text-muted-foreground">ERP financeiro</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium text-foreground">{user?.nome ?? user?.email}</div>
+                <div className="text-sm font-medium text-foreground">{displayName}</div>
                 <div className="text-[11px] text-muted-foreground">{user?.email}</div>
               </div>
               <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">

@@ -119,32 +119,27 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { setUser } = useAuthStore();
+  const { setUser, setInitialized } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email ?? "",
-          nome: session.user.user_metadata?.nome ?? session.user.email?.split("@")[0] ?? "Usuário",
-        });
-      } else {
-        setUser(null);
+    if (!isSupabaseConfigured) {
+      setInitialized(true);
+      return;
+    }
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
       }
     });
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) {
-        setUser({
-          id: data.session.user.id,
-          email: data.session.user.email ?? "",
-          nome: data.session.user.user_metadata?.nome ?? "Usuário",
-        });
-      }
+      setUser(data.session?.user ?? null);
+      setInitialized(true);
     });
     return () => sub.subscription.unsubscribe();
-  }, [setUser]);
+  }, [setUser, setInitialized, router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -154,3 +149,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
