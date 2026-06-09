@@ -99,7 +99,16 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/notificacoes")}>
+                  <Link to="/notificacoes">
+                    <Bell className="h-4 w-4" />
+                    {!collapsed && <span>Notificações</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
+
           </SidebarGroupContent>
         </SidebarGroup>
 
