@@ -38,10 +38,11 @@ export function AttachmentField({
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Lazy load preview URL when value changes
-  useState(() => {
+  useEffect(() => {
     if (value) getSignedUrl(value).then(setPreviewUrl);
-  });
+    else setPreviewUrl(null);
+  }, [value]);
+
 
   const handleFile = async (file: File) => {
     if (!companyId) {
