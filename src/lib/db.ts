@@ -318,6 +318,7 @@ export const fetchSuppliers = listByCompany<Supplier>("suppliers");
 export const fetchProducts = listByCompany<Product>("products");
 export const fetchCategories = listByCompany<Category>("categories");
 export const fetchBankAccounts = listByCompany<BankAccount>("bank_accounts");
+export const fetchCreditCards = listByCompany<CreditCard>("credit_cards");
 export const fetchSalesOrders = listByCompany<SalesOrder>("sales_orders");
 export const fetchBankStatements = listByCompany<BankStatement>("bank_statements");
 
