@@ -34,6 +34,7 @@ import {
   notifyRequesterApprovalDecision,
   type ApprovalAction,
 } from "@/lib/approvals";
+import { ApprovalTimeline } from "@/components/financeiro/ApprovalTimeline";
 
 export const Route = createFileRoute("/_authenticated/aprovacoes")({
   ssr: false,
