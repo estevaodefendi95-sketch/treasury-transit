@@ -18,6 +18,7 @@ import { Route as AuthenticatedProjecaoRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOrcamentoRouteImport } from './routes/_authenticated/orcamento'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCobrancasRouteImport } from './routes/_authenticated/cobrancas'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
 import { Route as AuthenticatedCentrosDeCustoRouteRouteImport } from './routes/_authenticated/centros-de-custo/route'
 import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
@@ -82,6 +83,11 @@ const AuthenticatedNotificacoesRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCobrancasRoute = AuthenticatedCobrancasRouteImport.update({
+  id: '/cobrancas',
+  path: '/cobrancas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/cobrancas': typeof AuthenticatedCobrancasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/orcamento': typeof AuthenticatedOrcamentoRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/cobrancas': typeof AuthenticatedCobrancasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/orcamento': typeof AuthenticatedOrcamentoRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/_authenticated/cobrancas': typeof AuthenticatedCobrancasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/orcamento': typeof AuthenticatedOrcamentoRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/centros-de-custo'
     | '/aprovacoes'
+    | '/cobrancas'
     | '/dashboard'
     | '/notificacoes'
     | '/orcamento'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/aprovacoes'
+    | '/cobrancas'
     | '/dashboard'
     | '/notificacoes'
     | '/orcamento'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/aprovacoes'
+    | '/_authenticated/cobrancas'
     | '/_authenticated/dashboard'
     | '/_authenticated/notificacoes'
     | '/_authenticated/orcamento'
@@ -458,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cobrancas': {
+      id: '/_authenticated/cobrancas'
+      path: '/cobrancas'
+      fullPath: '/cobrancas'
+      preLoaderRoute: typeof AuthenticatedCobrancasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/aprovacoes': {
@@ -624,6 +643,7 @@ const AuthenticatedCentrosDeCustoRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentrosDeCustoRouteRoute: typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
+  AuthenticatedCobrancasRoute: typeof AuthenticatedCobrancasRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedOrcamentoRoute: typeof AuthenticatedOrcamentoRoute
@@ -651,6 +671,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentrosDeCustoRouteRoute:
     AuthenticatedCentrosDeCustoRouteRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
+  AuthenticatedCobrancasRoute: AuthenticatedCobrancasRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedOrcamentoRoute: AuthenticatedOrcamentoRoute,
@@ -697,3 +718,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
