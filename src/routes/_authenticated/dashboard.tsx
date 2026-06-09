@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck, Sparkles, AlertTriangle } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck, Sparkles, AlertTriangle, Lock } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { transactionsQuery, formatBRL, isOverdue, type Transaction } from "@/lib/db";
@@ -16,9 +16,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
-  const { companyId, profile } = useCurrentCompany();
+  const { companyId, profile, company } = useCurrentCompany();
   const { data: transacoes = [], isLoading } = useQuery(transactionsQuery(companyId));
   const isAdmin = profile?.role === "admin";
+  const lockedUntil = company?.locked_until ?? null;
   const pendingApprovals = transacoes.filter((t) => t.approval_status === "aguardando_aprovacao");
   const projection30 = transacoes.length > 0 ? computeProjection(transacoes, 30) : null;
 
@@ -58,6 +59,16 @@ function DashboardPage() {
         <div className="text-sm text-muted-foreground">Carregando…</div>
       ) : (
         <>
+          {lockedUntil && (
+            <Card className="border-slate-300 bg-slate-50">
+              <CardContent className="pt-4 pb-4 flex items-center gap-3">
+                <Lock className="h-5 w-5 text-slate-700" />
+                <div className="text-sm text-slate-800">
+                  Período até <span className="font-semibold">{lockedUntil}</span> está fechado para edição.
+                </div>
+              </CardContent>
+            </Card>
+          )}
           {isAdmin && pendingApprovals.length > 0 && (
             <Card className="border-amber-300 bg-amber-50">
               <CardContent className="pt-6 flex items-center justify-between">

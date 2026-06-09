@@ -57,6 +57,7 @@ const financeiroItems = [
   { title: "Categorias", url: "/financeiro/categorias", icon: Tags },
   { title: "Centros de Custo", url: "/centros-de-custo", icon: Building2 },
   { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
+  { title: "Importar NF-e", url: "/financeiro/importar-nfe", icon: Receipt },
   { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
 ];
