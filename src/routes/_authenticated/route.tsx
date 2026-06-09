@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/useStore";
@@ -17,15 +17,28 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthenticatedLayout() {
-  const { needsOnboarding, isLoading } = useCurrentCompany();
+  const { needsOnboarding, isLoading, profile } = useCurrentCompany();
   const navigate = useNavigate();
   const initialized = useAuthStore((s) => s.initialized);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (!isLoading && initialized && needsOnboarding) {
       navigate({ to: "/onboarding" });
     }
   }, [isLoading, initialized, needsOnboarding, navigate]);
+
+  // Contador role: redirect to area do contador
+  useEffect(() => {
+    if (profile?.role === "contador" && !pathname.startsWith("/contador")) {
+      navigate({ to: "/contador/dashboard" });
+    }
+  }, [profile?.role, pathname, navigate]);
+
+  // Contador area uses its own chrome — render bare
+  if (pathname.startsWith("/contador")) {
+    return <Outlet />;
+  }
 
   return (
     <AppLayout>
