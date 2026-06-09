@@ -1,141 +1,137 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useAppStore, formatBRL, formatDateBR, type Transacao } from "@/store/useStore";
-import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
+import { useCurrentCompany } from "@/hooks/useCurrentCompany";
+import {
+  transactionsQuery, insertRow,
+  formatBRL, formatDateBR, statusLabel, todayISO, type Transaction,
+} from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
+  ssr: false,
   head: () => ({ meta: [{ title: "Transações — SuaEmpresa Gestão" }] }),
   component: TransacoesPage,
 });
 
 function TransacoesPage() {
-  const { transacoes, addTransacao } = useAppStore();
+  const { companyId } = useCurrentCompany();
+  const qc = useQueryClient();
+  const { data: transacoes = [] } = useQuery(transactionsQuery(companyId));
+
+  const [filter, setFilter] = useState("");
   const [open, setOpen] = useState(false);
-  const [filter, setFilter] = useState<"todas" | "receita" | "despesa">("todas");
+  const [form, setForm] = useState({ type: "income", description: "", amount: "", due_date: todayISO() });
 
-  const [form, setForm] = useState<Partial<Transacao>>({ tipo: "receita", status: "pendente", data: new Date().toISOString().slice(0, 10) });
+  const filtered = transacoes.filter((t) =>
+    t.description.toLowerCase().includes(filter.toLowerCase()),
+  );
 
-  const filtered = transacoes.filter((t) => filter === "todas" || t.tipo === filter);
-
-  const handleSave = () => {
-    if (!form.descricao || !form.valor) {
-      toast.error("Preencha descrição e valor.");
-      return;
-    }
-    addTransacao({
-      id: crypto.randomUUID(),
-      data: form.data ?? new Date().toISOString().slice(0, 10),
-      descricao: form.descricao,
-      categoria: form.categoria ?? "Outros",
-      tipo: form.tipo as "receita" | "despesa",
-      valor: Number(form.valor),
-      conta: form.conta,
-      status: form.status as Transacao["status"],
-    });
-    toast.success("Transação registrada!");
-    setOpen(false);
-    setForm({ tipo: "receita", status: "pendente", data: new Date().toISOString().slice(0, 10) });
-  };
+  const create = useMutation({
+    mutationFn: async () => {
+      if (!companyId) throw new Error("Sem empresa");
+      return insertRow<Transaction>("transactions", {
+        company_id: companyId,
+        type: form.type,
+        status: "pending",
+        description: form.description,
+        amount: Number(form.amount.replace(",", ".")),
+        due_date: form.due_date,
+      } as unknown as Transaction);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["transactions", companyId] });
+      toast.success("Transação criada");
+      setOpen(false);
+      setForm({ type: "income", description: "", amount: "", due_date: todayISO() });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
-    <>
+    <div className="space-y-6">
       <PageHeader
         title="Transações"
-        description="Histórico de movimentações financeiras."
+        description="Todas as movimentações financeiras."
         actions={
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-2" />Nova transação</Button>
-            </DialogTrigger>
+            <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />Nova</Button></DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>Nova transação</DialogTitle></DialogHeader>
-              <div className="grid grid-cols-2 gap-4 py-2">
-                <div className="space-y-2 col-span-2">
-                  <Label>Descrição</Label>
-                  <Input value={form.descricao ?? ""} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
-                </div>
+              <div className="space-y-3">
                 <div className="space-y-2">
                   <Label>Tipo</Label>
-                  <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v as "receita" | "despesa" })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="receita">Receita</SelectItem>
-                      <SelectItem value="despesa">Despesa</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                  </select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Valor (R$)</Label>
-                  <Input type="number" step="0.01" value={form.valor ?? ""} onChange={(e) => setForm({ ...form, valor: Number(e.target.value) })} />
+                  <Label>Descrição</Label>
+                  <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Data</Label>
-                  <Input type="date" value={form.data ?? ""} onChange={(e) => setForm({ ...form, data: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Valor (R$)</Label>
+                    <Input value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Data</Label>
+                    <Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Categoria</Label>
-                  <Input value={form.categoria ?? ""} onChange={(e) => setForm({ ...form, categoria: e.target.value })} />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label>Conta bancária</Label>
-                  <Input value={form.conta ?? ""} onChange={(e) => setForm({ ...form, conta: e.target.value })} />
-                </div>
+                <Button onClick={() => create.mutate()} disabled={create.isPending || !form.description || !form.amount} className="w-full">
+                  {create.isPending ? "Salvando..." : "Criar"}
+                </Button>
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-                <Button onClick={handleSave}>Salvar</Button>
-              </DialogFooter>
             </DialogContent>
           </Dialog>
         }
       />
-
-      <Card className="mb-4">
-        <CardContent className="pt-6 flex items-center gap-2">
-          <span className="text-sm text-muted-foreground mr-2">Filtrar:</span>
-          {(["todas", "receita", "despesa"] as const).map((f) => (
-            <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)}>
-              {f === "todas" ? "Todas" : f === "receita" ? "Receitas" : "Despesas"}
-            </Button>
-          ))}
-        </CardContent>
-      </Card>
-
       <Card>
-        <CardContent className="pt-6">
+        <CardHeader>
+          <CardTitle className="text-base">Histórico</CardTitle>
+          <div className="relative mt-2">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input className="pl-8" placeholder="Buscar..." value={filter} onChange={(e) => setFilter(e.target.value)} />
+          </div>
+        </CardHeader>
+        <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
                 <TableHead>Descrição</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Conta</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
+              {filtered.length === 0 && (
+                <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">Nenhuma transação</TableCell></TableRow>
+              )}
               {filtered.map((t) => (
                 <TableRow key={t.id}>
-                  <TableCell>{formatDateBR(t.data)}</TableCell>
-                  <TableCell className="font-medium">{t.descricao}</TableCell>
-                  <TableCell>{t.categoria}</TableCell>
-                  <TableCell>{t.conta ?? "-"}</TableCell>
+                  <TableCell>{formatDateBR(t.payment_date ?? t.due_date)}</TableCell>
+                  <TableCell className="font-medium">{t.description}</TableCell>
                   <TableCell>
-                    <Badge variant={t.status === "pendente" ? "secondary" : "default"}>{t.status}</Badge>
+                    <Badge variant={t.type === "income" ? "default" : "secondary"}>
+                      {t.type === "income" ? "Receita" : "Despesa"}
+                    </Badge>
                   </TableCell>
-                  <TableCell className={`text-right font-semibold ${t.tipo === "receita" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                    {t.tipo === "receita" ? "+" : "-"} {formatBRL(t.valor)}
+                  <TableCell>{statusLabel(t.status)}</TableCell>
+                  <TableCell className={`text-right font-mono ${t.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
+                    {t.type === "income" ? "+" : "-"} {formatBRL(Number(t.amount))}
                   </TableCell>
                 </TableRow>
               ))}
@@ -143,6 +139,6 @@ function TransacoesPage() {
           </Table>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }
