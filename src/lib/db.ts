@@ -127,7 +127,23 @@ export type BankAccount = {
   agency: string | null;
   account_number: string | null;
   balance: number | null;
+  initial_balance?: number | null;
+  minimum_balance?: number | null;
+  color?: string | null;
   is_active: boolean | null;
+};
+
+export type CreditCard = {
+  id: string;
+  company_id: string;
+  name: string;
+  brand: string | null;
+  last_four_digits: string | null;
+  credit_limit: number | null;
+  closing_day: number | null;
+  due_day: number | null;
+  color: string | null;
+  is_active?: boolean | null;
 };
 
 export type SalesOrder = {
