@@ -407,11 +407,13 @@ function TransacoesPage() {
                               {isTransferType(t.type) && <ArrowRightLeft className="h-3 w-3 text-cyan-600" />}
                               {t.description}
                               <RecurrenceBadge tx={t} />
+                              <AttachmentBadge path={t.attachment_url} />
                               <button onClick={() => startEdit(t)}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                               </button>
                             </div>
+
                             {t.original_description && t.original_description !== t.description && (
                               <div className="text-[10px] text-muted-foreground italic">{t.original_description}</div>
                             )}
