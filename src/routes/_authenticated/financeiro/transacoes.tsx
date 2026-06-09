@@ -427,6 +427,12 @@ function TransacoesPage() {
                               {t.description}
                               <RecurrenceBadge tx={t} />
                               <AttachmentBadge path={t.attachment_url} />
+                              {t.approval_status === "aguardando_aprovacao" && (
+                                <Badge className="bg-amber-100 text-amber-800 text-[9px] px-1 py-0">⏳ Aguardando aprovação</Badge>
+                              )}
+                              {t.approval_status === "rejeitado" && (
+                                <Badge className="bg-rose-100 text-rose-800 text-[9px] px-1 py-0">✗ Rejeitado</Badge>
+                              )}
                               <button onClick={() => startEdit(t)}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
