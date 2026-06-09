@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck, Sparkles, AlertTriangle } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { transactionsQuery, formatBRL, isOverdue, type Transaction } from "@/lib/db";
+import { computeProjection } from "@/lib/projection";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   ssr: false,
