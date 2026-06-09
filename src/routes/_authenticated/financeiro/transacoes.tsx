@@ -48,19 +48,24 @@ function TransacoesPage() {
   const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
   const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
+  const { data: costCenters = [] } = useQuery(costCentersQuery(companyId));
   const categorize = useServerFn(categorizeTransaction);
   const learnName = useServerFn(learnNameRule);
 
   const [filter, setFilter] = useState("");
   const [accountFilter, setAccountFilter] = useState("");
+  const [onlyMissingAttachment, setOnlyMissingAttachment] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     type: "expense" as "income" | "expense",
     description: "", amount: "", due_date: todayISO(),
     category_id: "" as string | null,
+    cost_center_id: "" as string | null,
     recurrence: "unico" as Recurrence,
   });
   const [payment, setPayment] = useState<PaymentFields>(emptyPaymentFields);
+  const [pendingAttachment, setPendingAttachment] = useState<string | null>(null);
+  const [pendingDraftId] = useState(() => crypto.randomUUID());
   const [suggesting, setSuggesting] = useState(false);
   const [suggestion, setSuggestion] = useState<{ category_id: string | null; category_name: string | null; confidence: number; reason: string } | null>(null);
   const [autoApplied, setAutoApplied] = useState(false);
@@ -74,8 +79,10 @@ function TransacoesPage() {
   const filtered = transacoes.filter((t) => {
     if (!t.description.toLowerCase().includes(filter.toLowerCase())) return false;
     if (accountFilter && t.bank_account_id !== accountFilter) return false;
+    if (onlyMissingAttachment && t.attachment_url) return false;
     return true;
   });
+
 
   useEffect(() => {
     setSuggestion(null);
