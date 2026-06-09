@@ -24,6 +24,8 @@ import {
   Sparkles,
   Target,
   Receipt,
+  Settings,
+  Banknote,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
@@ -55,6 +57,7 @@ const financeiroItems = [
   { title: "Categorias", url: "/financeiro/categorias", icon: Tags },
   { title: "Centros de Custo", url: "/centros-de-custo", icon: Building2 },
   { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
+  { title: "Importar NF-e", url: "/financeiro/importar-nfe", icon: Receipt },
   { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
 ];
@@ -157,6 +160,14 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/configuracoes")}>
+                  <Link to="/configuracoes">
+                    <Settings className="h-4 w-4" />
+                    {!collapsed && <span>Configurações</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
 
           </SidebarGroupContent>

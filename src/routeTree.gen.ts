@@ -20,13 +20,16 @@ import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCobrancasRouteImport } from './routes/_authenticated/cobrancas'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedContadorRouteRouteImport } from './routes/_authenticated/contador/route'
 import { Route as AuthenticatedCentrosDeCustoRouteRouteImport } from './routes/_authenticated/centros-de-custo/route'
+import { Route as AuthenticatedConfiguracoesIndexRouteImport } from './routes/_authenticated/configuracoes/index'
 import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
 import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
 import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
 import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
 import { Route as AuthenticatedFinanceiroTransacoesRouteImport } from './routes/_authenticated/financeiro/transacoes'
 import { Route as AuthenticatedFinanceiroRegrasNomesRouteImport } from './routes/_authenticated/financeiro/regras-nomes'
+import { Route as AuthenticatedFinanceiroImportarNfeRouteImport } from './routes/_authenticated/financeiro/importar-nfe'
 import { Route as AuthenticatedFinanceiroImportarRouteImport } from './routes/_authenticated/financeiro/importar'
 import { Route as AuthenticatedFinanceiroFluxoCaixaRouteImport } from './routes/_authenticated/financeiro/fluxo-caixa'
 import { Route as AuthenticatedFinanceiroContasReceberRouteImport } from './routes/_authenticated/financeiro/contas-receber'
@@ -36,6 +39,11 @@ import { Route as AuthenticatedFinanceiroConciliacaoRouteImport } from './routes
 import { Route as AuthenticatedFinanceiroCategoriasRouteImport } from './routes/_authenticated/financeiro/categorias'
 import { Route as AuthenticatedFinanceiroCartoesRouteImport } from './routes/_authenticated/financeiro/cartoes'
 import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
+import { Route as AuthenticatedContadorRelatoriosRouteImport } from './routes/_authenticated/contador/relatorios'
+import { Route as AuthenticatedContadorLancamentosRouteImport } from './routes/_authenticated/contador/lancamentos'
+import { Route as AuthenticatedContadorExportarRouteImport } from './routes/_authenticated/contador/exportar'
+import { Route as AuthenticatedContadorDashboardRouteImport } from './routes/_authenticated/contador/dashboard'
+import { Route as AuthenticatedConfiguracoesOpenBankingRouteImport } from './routes/_authenticated/configuracoes/open-banking'
 import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './routes/_authenticated/configuracoes/notificacoes'
 import { Route as AuthenticatedConfiguracoesCobrancasRouteImport } from './routes/_authenticated/configuracoes/cobrancas'
 import { Route as AuthenticatedConfiguracoesAprovacoesRouteImport } from './routes/_authenticated/configuracoes/aprovacoes'
@@ -96,10 +104,22 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedContadorRouteRoute =
+  AuthenticatedContadorRouteRouteImport.update({
+    id: '/contador',
+    path: '/contador',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentrosDeCustoRouteRoute =
   AuthenticatedCentrosDeCustoRouteRouteImport.update({
     id: '/centros-de-custo',
     path: '/centros-de-custo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConfiguracoesIndexRoute =
+  AuthenticatedConfiguracoesIndexRouteImport.update({
+    id: '/configuracoes/',
+    path: '/configuracoes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCentrosDeCustoIndexRoute =
@@ -136,6 +156,12 @@ const AuthenticatedFinanceiroRegrasNomesRoute =
   AuthenticatedFinanceiroRegrasNomesRouteImport.update({
     id: '/financeiro/regras-nomes',
     path: '/financeiro/regras-nomes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroImportarNfeRoute =
+  AuthenticatedFinanceiroImportarNfeRouteImport.update({
+    id: '/financeiro/importar-nfe',
+    path: '/financeiro/importar-nfe',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedFinanceiroImportarRoute =
@@ -192,6 +218,36 @@ const AuthenticatedFinanceiroCalendarioRoute =
     path: '/financeiro/calendario',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedContadorRelatoriosRoute =
+  AuthenticatedContadorRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedContadorRouteRoute,
+  } as any)
+const AuthenticatedContadorLancamentosRoute =
+  AuthenticatedContadorLancamentosRouteImport.update({
+    id: '/lancamentos',
+    path: '/lancamentos',
+    getParentRoute: () => AuthenticatedContadorRouteRoute,
+  } as any)
+const AuthenticatedContadorExportarRoute =
+  AuthenticatedContadorExportarRouteImport.update({
+    id: '/exportar',
+    path: '/exportar',
+    getParentRoute: () => AuthenticatedContadorRouteRoute,
+  } as any)
+const AuthenticatedContadorDashboardRoute =
+  AuthenticatedContadorDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedContadorRouteRoute,
+  } as any)
+const AuthenticatedConfiguracoesOpenBankingRoute =
+  AuthenticatedConfiguracoesOpenBankingRouteImport.update({
+    id: '/configuracoes/open-banking',
+    path: '/configuracoes/open-banking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConfiguracoesNotificacoesRoute =
   AuthenticatedConfiguracoesNotificacoesRouteImport.update({
     id: '/configuracoes/notificacoes',
@@ -222,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
+  '/contador': typeof AuthenticatedContadorRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/cobrancas': typeof AuthenticatedCobrancasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -233,6 +290,11 @@ export interface FileRoutesByFullPath {
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
+  '/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
+  '/contador/exportar': typeof AuthenticatedContadorExportarRoute
+  '/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
+  '/contador/relatorios': typeof AuthenticatedContadorRelatoriosRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -242,17 +304,20 @@ export interface FileRoutesByFullPath {
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
   '/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
+  '/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
+  '/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/contador': typeof AuthenticatedContadorRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/cobrancas': typeof AuthenticatedCobrancasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -264,6 +329,11 @@ export interface FileRoutesByTo {
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
+  '/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
+  '/contador/exportar': typeof AuthenticatedContadorExportarRoute
+  '/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
+  '/contador/relatorios': typeof AuthenticatedContadorRelatoriosRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -273,12 +343,14 @@ export interface FileRoutesByTo {
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
   '/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
+  '/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoIndexRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -287,6 +359,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
+  '/_authenticated/contador': typeof AuthenticatedContadorRouteRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/cobrancas': typeof AuthenticatedCobrancasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -298,6 +371,11 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/_authenticated/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
+  '/_authenticated/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/_authenticated/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
+  '/_authenticated/contador/exportar': typeof AuthenticatedContadorExportarRoute
+  '/_authenticated/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
+  '/_authenticated/contador/relatorios': typeof AuthenticatedContadorRelatoriosRoute
   '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/_authenticated/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/_authenticated/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
@@ -307,12 +385,14 @@ export interface FileRoutesById {
   '/_authenticated/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/_authenticated/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
   '/_authenticated/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
+  '/_authenticated/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/_authenticated/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/_authenticated/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/_authenticated/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/_authenticated/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/_authenticated/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
+  '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -321,6 +401,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/centros-de-custo'
+    | '/contador'
     | '/aprovacoes'
     | '/cobrancas'
     | '/dashboard'
@@ -332,6 +413,11 @@ export interface FileRouteTypes {
     | '/configuracoes/aprovacoes'
     | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
+    | '/configuracoes/open-banking'
+    | '/contador/dashboard'
+    | '/contador/exportar'
+    | '/contador/lancamentos'
+    | '/contador/relatorios'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
     | '/financeiro/categorias'
@@ -341,17 +427,20 @@ export interface FileRouteTypes {
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
     | '/financeiro/importar'
+    | '/financeiro/importar-nfe'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
     | '/centros-de-custo/'
+    | '/configuracoes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/contador'
     | '/aprovacoes'
     | '/cobrancas'
     | '/dashboard'
@@ -363,6 +452,11 @@ export interface FileRouteTypes {
     | '/configuracoes/aprovacoes'
     | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
+    | '/configuracoes/open-banking'
+    | '/contador/dashboard'
+    | '/contador/exportar'
+    | '/contador/lancamentos'
+    | '/contador/relatorios'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
     | '/financeiro/categorias'
@@ -372,12 +466,14 @@ export interface FileRouteTypes {
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
     | '/financeiro/importar'
+    | '/financeiro/importar-nfe'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
     | '/centros-de-custo'
+    | '/configuracoes'
   id:
     | '__root__'
     | '/'
@@ -385,6 +481,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/_authenticated/centros-de-custo'
+    | '/_authenticated/contador'
     | '/_authenticated/aprovacoes'
     | '/_authenticated/cobrancas'
     | '/_authenticated/dashboard'
@@ -396,6 +493,11 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes/aprovacoes'
     | '/_authenticated/configuracoes/cobrancas'
     | '/_authenticated/configuracoes/notificacoes'
+    | '/_authenticated/configuracoes/open-banking'
+    | '/_authenticated/contador/dashboard'
+    | '/_authenticated/contador/exportar'
+    | '/_authenticated/contador/lancamentos'
+    | '/_authenticated/contador/relatorios'
     | '/_authenticated/financeiro/calendario'
     | '/_authenticated/financeiro/cartoes'
     | '/_authenticated/financeiro/categorias'
@@ -405,12 +507,14 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro/contas-receber'
     | '/_authenticated/financeiro/fluxo-caixa'
     | '/_authenticated/financeiro/importar'
+    | '/_authenticated/financeiro/importar-nfe'
     | '/_authenticated/financeiro/regras-nomes'
     | '/_authenticated/financeiro/transacoes'
     | '/_authenticated/vendas/clientes'
     | '/_authenticated/vendas/pedidos'
     | '/_authenticated/vendas/produtos'
     | '/_authenticated/centros-de-custo/'
+    | '/_authenticated/configuracoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -499,11 +603,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/contador': {
+      id: '/_authenticated/contador'
+      path: '/contador'
+      fullPath: '/contador'
+      preLoaderRoute: typeof AuthenticatedContadorRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/centros-de-custo': {
       id: '/_authenticated/centros-de-custo'
       path: '/centros-de-custo'
       fullPath: '/centros-de-custo'
       preLoaderRoute: typeof AuthenticatedCentrosDeCustoRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/configuracoes/': {
+      id: '/_authenticated/configuracoes/'
+      path: '/configuracoes'
+      fullPath: '/configuracoes/'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/centros-de-custo/': {
@@ -546,6 +664,13 @@ declare module '@tanstack/react-router' {
       path: '/financeiro/regras-nomes'
       fullPath: '/financeiro/regras-nomes'
       preLoaderRoute: typeof AuthenticatedFinanceiroRegrasNomesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/importar-nfe': {
+      id: '/_authenticated/financeiro/importar-nfe'
+      path: '/financeiro/importar-nfe'
+      fullPath: '/financeiro/importar-nfe'
+      preLoaderRoute: typeof AuthenticatedFinanceiroImportarNfeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro/importar': {
@@ -611,6 +736,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroCalendarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/contador/relatorios': {
+      id: '/_authenticated/contador/relatorios'
+      path: '/relatorios'
+      fullPath: '/contador/relatorios'
+      preLoaderRoute: typeof AuthenticatedContadorRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedContadorRouteRoute
+    }
+    '/_authenticated/contador/lancamentos': {
+      id: '/_authenticated/contador/lancamentos'
+      path: '/lancamentos'
+      fullPath: '/contador/lancamentos'
+      preLoaderRoute: typeof AuthenticatedContadorLancamentosRouteImport
+      parentRoute: typeof AuthenticatedContadorRouteRoute
+    }
+    '/_authenticated/contador/exportar': {
+      id: '/_authenticated/contador/exportar'
+      path: '/exportar'
+      fullPath: '/contador/exportar'
+      preLoaderRoute: typeof AuthenticatedContadorExportarRouteImport
+      parentRoute: typeof AuthenticatedContadorRouteRoute
+    }
+    '/_authenticated/contador/dashboard': {
+      id: '/_authenticated/contador/dashboard'
+      path: '/dashboard'
+      fullPath: '/contador/dashboard'
+      preLoaderRoute: typeof AuthenticatedContadorDashboardRouteImport
+      parentRoute: typeof AuthenticatedContadorRouteRoute
+    }
+    '/_authenticated/configuracoes/open-banking': {
+      id: '/_authenticated/configuracoes/open-banking'
+      path: '/configuracoes/open-banking'
+      fullPath: '/configuracoes/open-banking'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesOpenBankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/configuracoes/notificacoes': {
       id: '/_authenticated/configuracoes/notificacoes'
       path: '/configuracoes/notificacoes'
@@ -660,8 +820,30 @@ const AuthenticatedCentrosDeCustoRouteRouteWithChildren =
     AuthenticatedCentrosDeCustoRouteRouteChildren,
   )
 
+interface AuthenticatedContadorRouteRouteChildren {
+  AuthenticatedContadorDashboardRoute: typeof AuthenticatedContadorDashboardRoute
+  AuthenticatedContadorExportarRoute: typeof AuthenticatedContadorExportarRoute
+  AuthenticatedContadorLancamentosRoute: typeof AuthenticatedContadorLancamentosRoute
+  AuthenticatedContadorRelatoriosRoute: typeof AuthenticatedContadorRelatoriosRoute
+}
+
+const AuthenticatedContadorRouteRouteChildren: AuthenticatedContadorRouteRouteChildren =
+  {
+    AuthenticatedContadorDashboardRoute: AuthenticatedContadorDashboardRoute,
+    AuthenticatedContadorExportarRoute: AuthenticatedContadorExportarRoute,
+    AuthenticatedContadorLancamentosRoute:
+      AuthenticatedContadorLancamentosRoute,
+    AuthenticatedContadorRelatoriosRoute: AuthenticatedContadorRelatoriosRoute,
+  }
+
+const AuthenticatedContadorRouteRouteWithChildren =
+  AuthenticatedContadorRouteRoute._addFileChildren(
+    AuthenticatedContadorRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentrosDeCustoRouteRoute: typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
+  AuthenticatedContadorRouteRoute: typeof AuthenticatedContadorRouteRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedCobrancasRoute: typeof AuthenticatedCobrancasRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -672,6 +854,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesAprovacoesRoute: typeof AuthenticatedConfiguracoesAprovacoesRoute
   AuthenticatedConfiguracoesCobrancasRoute: typeof AuthenticatedConfiguracoesCobrancasRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
+  AuthenticatedConfiguracoesOpenBankingRoute: typeof AuthenticatedConfiguracoesOpenBankingRoute
   AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
   AuthenticatedFinanceiroCartoesRoute: typeof AuthenticatedFinanceiroCartoesRoute
   AuthenticatedFinanceiroCategoriasRoute: typeof AuthenticatedFinanceiroCategoriasRoute
@@ -681,16 +864,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceiroContasReceberRoute: typeof AuthenticatedFinanceiroContasReceberRoute
   AuthenticatedFinanceiroFluxoCaixaRoute: typeof AuthenticatedFinanceiroFluxoCaixaRoute
   AuthenticatedFinanceiroImportarRoute: typeof AuthenticatedFinanceiroImportarRoute
+  AuthenticatedFinanceiroImportarNfeRoute: typeof AuthenticatedFinanceiroImportarNfeRoute
   AuthenticatedFinanceiroRegrasNomesRoute: typeof AuthenticatedFinanceiroRegrasNomesRoute
   AuthenticatedFinanceiroTransacoesRoute: typeof AuthenticatedFinanceiroTransacoesRoute
   AuthenticatedVendasClientesRoute: typeof AuthenticatedVendasClientesRoute
   AuthenticatedVendasPedidosRoute: typeof AuthenticatedVendasPedidosRoute
   AuthenticatedVendasProdutosRoute: typeof AuthenticatedVendasProdutosRoute
+  AuthenticatedConfiguracoesIndexRoute: typeof AuthenticatedConfiguracoesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentrosDeCustoRouteRoute:
     AuthenticatedCentrosDeCustoRouteRouteWithChildren,
+  AuthenticatedContadorRouteRoute: AuthenticatedContadorRouteRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedCobrancasRoute: AuthenticatedCobrancasRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
@@ -704,6 +890,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConfiguracoesCobrancasRoute,
   AuthenticatedConfiguracoesNotificacoesRoute:
     AuthenticatedConfiguracoesNotificacoesRoute,
+  AuthenticatedConfiguracoesOpenBankingRoute:
+    AuthenticatedConfiguracoesOpenBankingRoute,
   AuthenticatedFinanceiroCalendarioRoute:
     AuthenticatedFinanceiroCalendarioRoute,
   AuthenticatedFinanceiroCartoesRoute: AuthenticatedFinanceiroCartoesRoute,
@@ -720,6 +908,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceiroFluxoCaixaRoute:
     AuthenticatedFinanceiroFluxoCaixaRoute,
   AuthenticatedFinanceiroImportarRoute: AuthenticatedFinanceiroImportarRoute,
+  AuthenticatedFinanceiroImportarNfeRoute:
+    AuthenticatedFinanceiroImportarNfeRoute,
   AuthenticatedFinanceiroRegrasNomesRoute:
     AuthenticatedFinanceiroRegrasNomesRoute,
   AuthenticatedFinanceiroTransacoesRoute:
@@ -727,6 +917,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVendasClientesRoute: AuthenticatedVendasClientesRoute,
   AuthenticatedVendasPedidosRoute: AuthenticatedVendasPedidosRoute,
   AuthenticatedVendasProdutosRoute: AuthenticatedVendasProdutosRoute,
+  AuthenticatedConfiguracoesIndexRoute: AuthenticatedConfiguracoesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -741,3 +932,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
