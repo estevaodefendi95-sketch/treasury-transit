@@ -20,6 +20,7 @@ function DashboardPage() {
   const { data: transacoes = [], isLoading } = useQuery(transactionsQuery(companyId));
   const isAdmin = profile?.role === "admin";
   const pendingApprovals = transacoes.filter((t) => t.approval_status === "aguardando_aprovacao");
+  const projection30 = transacoes.length > 0 ? computeProjection(transacoes, 30) : null;
 
   const receitas = transacoes.filter((t) => t.type === "income" && (t.status === "received" || t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
   const despesas = transacoes.filter((t) => t.type === "expense" && (t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
