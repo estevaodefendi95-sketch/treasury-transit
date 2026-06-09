@@ -146,6 +146,7 @@ export function AppSidebar() {
                     {!collapsed && <span>Cobranças</span>}
                   </Link>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
               {isAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith("/aprovacoes")}>
