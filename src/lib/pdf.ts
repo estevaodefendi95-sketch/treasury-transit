@@ -1,9 +1,8 @@
 // Extrai texto de um PDF no browser usando pdfjs-dist.
 export async function extractPdfText(file: File): Promise<string> {
   const pdfjs = await import("pdfjs-dist");
-  // worker via CDN para evitar bundling extra
-  // @ts-expect-error global property
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+  (pdfjs.GlobalWorkerOptions as { workerSrc: string }).workerSrc =
+    `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
   const buf = await file.arrayBuffer();
   const doc = await pdfjs.getDocument({ data: buf }).promise;
   let out = "";
