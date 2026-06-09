@@ -397,3 +397,63 @@ export const statusLabel = (s: string | null | undefined): string => {
       return s ?? "—";
   }
 };
+
+// ---------- Tipos extras Fase 2 ----------
+export type CategoryRule = {
+  id: string;
+  company_id: string | null;
+  pattern: string;
+  category_id: string | null;
+  times_applied: number | null;
+  last_applied: string | null;
+  created_at?: string;
+};
+
+export type NameRule = {
+  id: string;
+  company_id: string | null;
+  original_pattern: string;
+  suggested_name: string;
+  times_applied: number | null;
+  created_at?: string;
+};
+
+export type BankStatementImport = {
+  id: string;
+  company_id: string | null;
+  bank_account_id: string | null;
+  filename: string | null;
+  import_type: string | null;
+  total_transactions: number | null;
+  matched_transactions: number | null;
+  status: string | null;
+  imported_at: string | null;
+};
+
+export const fetchCategoryRules = listByCompany<CategoryRule>("category_rules");
+export const fetchNameRules = listByCompany<NameRule>("name_rules");
+
+export const categoryRulesQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["category_rules", companyId],
+    queryFn: () => (companyId ? fetchCategoryRules(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export const nameRulesQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["name_rules", companyId],
+    queryFn: () => (companyId ? fetchNameRules(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export function applyNameRules(description: string, rules: NameRule[]): { name: string; matched: NameRule | null } {
+  const lower = description.toLowerCase();
+  for (const r of rules) {
+    if (lower.includes(r.original_pattern.toLowerCase())) {
+      return { name: r.suggested_name, matched: r };
+    }
+  }
+  return { name: description, matched: null };
+}
+
