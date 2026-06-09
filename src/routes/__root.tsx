@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/useStore";
+
 
 function NotFoundComponent() {
   return (
@@ -115,11 +119,38 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { setUser } = useAuthStore();
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email ?? "",
+          nome: session.user.user_metadata?.nome ?? session.user.email?.split("@")[0] ?? "Usuário",
+        });
+      } else {
+        setUser(null);
+      }
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) {
+        setUser({
+          id: data.session.user.id,
+          email: data.session.user.email ?? "",
+          nome: data.session.user.user_metadata?.nome ?? "Usuário",
+        });
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [setUser]);
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
