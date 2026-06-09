@@ -23,8 +23,10 @@ import { Route as AuthenticatedFinanceiroImportarRouteImport } from './routes/_a
 import { Route as AuthenticatedFinanceiroFluxoCaixaRouteImport } from './routes/_authenticated/financeiro/fluxo-caixa'
 import { Route as AuthenticatedFinanceiroContasReceberRouteImport } from './routes/_authenticated/financeiro/contas-receber'
 import { Route as AuthenticatedFinanceiroContasPagarRouteImport } from './routes/_authenticated/financeiro/contas-pagar'
+import { Route as AuthenticatedFinanceiroContasBancariasRouteImport } from './routes/_authenticated/financeiro/contas-bancarias'
 import { Route as AuthenticatedFinanceiroConciliacaoRouteImport } from './routes/_authenticated/financeiro/conciliacao'
 import { Route as AuthenticatedFinanceiroCategoriasRouteImport } from './routes/_authenticated/financeiro/categorias'
+import { Route as AuthenticatedFinanceiroCartoesRouteImport } from './routes/_authenticated/financeiro/cartoes'
 import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
 
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -105,6 +107,12 @@ const AuthenticatedFinanceiroContasPagarRoute =
     path: '/financeiro/contas-pagar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinanceiroContasBancariasRoute =
+  AuthenticatedFinanceiroContasBancariasRouteImport.update({
+    id: '/financeiro/contas-bancarias',
+    path: '/financeiro/contas-bancarias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceiroConciliacaoRoute =
   AuthenticatedFinanceiroConciliacaoRouteImport.update({
     id: '/financeiro/conciliacao',
@@ -115,6 +123,12 @@ const AuthenticatedFinanceiroCategoriasRoute =
   AuthenticatedFinanceiroCategoriasRouteImport.update({
     id: '/financeiro/categorias',
     path: '/financeiro/categorias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroCartoesRoute =
+  AuthenticatedFinanceiroCartoesRouteImport.update({
+    id: '/financeiro/cartoes',
+    path: '/financeiro/cartoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedFinanceiroCalendarioRoute =
@@ -130,8 +144,10 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
   '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/contas-bancarias': typeof AuthenticatedFinanceiroContasBancariasRoute
   '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
@@ -148,8 +164,10 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
   '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/contas-bancarias': typeof AuthenticatedFinanceiroContasBancariasRoute
   '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
@@ -168,8 +186,10 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/_authenticated/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
   '/_authenticated/financeiro/categorias': typeof AuthenticatedFinanceiroCategoriasRoute
   '/_authenticated/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/_authenticated/financeiro/contas-bancarias': typeof AuthenticatedFinanceiroContasBancariasRoute
   '/_authenticated/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/_authenticated/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/_authenticated/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
@@ -188,8 +208,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/dashboard'
     | '/financeiro/calendario'
+    | '/financeiro/cartoes'
     | '/financeiro/categorias'
     | '/financeiro/conciliacao'
+    | '/financeiro/contas-bancarias'
     | '/financeiro/contas-pagar'
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
@@ -206,8 +228,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/dashboard'
     | '/financeiro/calendario'
+    | '/financeiro/cartoes'
     | '/financeiro/categorias'
     | '/financeiro/conciliacao'
+    | '/financeiro/contas-bancarias'
     | '/financeiro/contas-pagar'
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
@@ -225,8 +249,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro/calendario'
+    | '/_authenticated/financeiro/cartoes'
     | '/_authenticated/financeiro/categorias'
     | '/_authenticated/financeiro/conciliacao'
+    | '/_authenticated/financeiro/contas-bancarias'
     | '/_authenticated/financeiro/contas-pagar'
     | '/_authenticated/financeiro/contas-receber'
     | '/_authenticated/financeiro/fluxo-caixa'
@@ -345,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroContasPagarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financeiro/contas-bancarias': {
+      id: '/_authenticated/financeiro/contas-bancarias'
+      path: '/financeiro/contas-bancarias'
+      fullPath: '/financeiro/contas-bancarias'
+      preLoaderRoute: typeof AuthenticatedFinanceiroContasBancariasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financeiro/conciliacao': {
       id: '/_authenticated/financeiro/conciliacao'
       path: '/financeiro/conciliacao'
@@ -357,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/financeiro/categorias'
       fullPath: '/financeiro/categorias'
       preLoaderRoute: typeof AuthenticatedFinanceiroCategoriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/cartoes': {
+      id: '/_authenticated/financeiro/cartoes'
+      path: '/financeiro/cartoes'
+      fullPath: '/financeiro/cartoes'
+      preLoaderRoute: typeof AuthenticatedFinanceiroCartoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro/calendario': {
@@ -372,8 +412,10 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
+  AuthenticatedFinanceiroCartoesRoute: typeof AuthenticatedFinanceiroCartoesRoute
   AuthenticatedFinanceiroCategoriasRoute: typeof AuthenticatedFinanceiroCategoriasRoute
   AuthenticatedFinanceiroConciliacaoRoute: typeof AuthenticatedFinanceiroConciliacaoRoute
+  AuthenticatedFinanceiroContasBancariasRoute: typeof AuthenticatedFinanceiroContasBancariasRoute
   AuthenticatedFinanceiroContasPagarRoute: typeof AuthenticatedFinanceiroContasPagarRoute
   AuthenticatedFinanceiroContasReceberRoute: typeof AuthenticatedFinanceiroContasReceberRoute
   AuthenticatedFinanceiroFluxoCaixaRoute: typeof AuthenticatedFinanceiroFluxoCaixaRoute
@@ -389,10 +431,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroCalendarioRoute:
     AuthenticatedFinanceiroCalendarioRoute,
+  AuthenticatedFinanceiroCartoesRoute: AuthenticatedFinanceiroCartoesRoute,
   AuthenticatedFinanceiroCategoriasRoute:
     AuthenticatedFinanceiroCategoriasRoute,
   AuthenticatedFinanceiroConciliacaoRoute:
     AuthenticatedFinanceiroConciliacaoRoute,
+  AuthenticatedFinanceiroContasBancariasRoute:
+    AuthenticatedFinanceiroContasBancariasRoute,
   AuthenticatedFinanceiroContasPagarRoute:
     AuthenticatedFinanceiroContasPagarRoute,
   AuthenticatedFinanceiroContasReceberRoute:
@@ -421,3 +466,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
