@@ -37,6 +37,7 @@ import { Route as AuthenticatedFinanceiroCategoriasRouteImport } from './routes/
 import { Route as AuthenticatedFinanceiroCartoesRouteImport } from './routes/_authenticated/financeiro/cartoes'
 import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
 import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './routes/_authenticated/configuracoes/notificacoes'
+import { Route as AuthenticatedConfiguracoesCobrancasRouteImport } from './routes/_authenticated/configuracoes/cobrancas'
 import { Route as AuthenticatedConfiguracoesAprovacoesRouteImport } from './routes/_authenticated/configuracoes/aprovacoes'
 import { Route as AuthenticatedCentrosDeCustoRelatorioRouteImport } from './routes/_authenticated/centros-de-custo/relatorio'
 
@@ -197,6 +198,12 @@ const AuthenticatedConfiguracoesNotificacoesRoute =
     path: '/configuracoes/notificacoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConfiguracoesCobrancasRoute =
+  AuthenticatedConfiguracoesCobrancasRouteImport.update({
+    id: '/configuracoes/cobrancas',
+    path: '/configuracoes/cobrancas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConfiguracoesAprovacoesRoute =
   AuthenticatedConfiguracoesAprovacoesRouteImport.update({
     id: '/configuracoes/aprovacoes',
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
+  '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -254,6 +262,7 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
+  '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -287,6 +296,7 @@ export interface FileRoutesById {
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/_authenticated/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
+  '/_authenticated/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/_authenticated/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
+    | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
+    | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
@@ -382,6 +394,7 @@ export interface FileRouteTypes {
     | '/_authenticated/relatorios'
     | '/_authenticated/centros-de-custo/relatorio'
     | '/_authenticated/configuracoes/aprovacoes'
+    | '/_authenticated/configuracoes/cobrancas'
     | '/_authenticated/configuracoes/notificacoes'
     | '/_authenticated/financeiro/calendario'
     | '/_authenticated/financeiro/cartoes'
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesNotificacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/configuracoes/cobrancas': {
+      id: '/_authenticated/configuracoes/cobrancas'
+      path: '/configuracoes/cobrancas'
+      fullPath: '/configuracoes/cobrancas'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesCobrancasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/configuracoes/aprovacoes': {
       id: '/_authenticated/configuracoes/aprovacoes'
       path: '/configuracoes/aprovacoes'
@@ -650,6 +670,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjecaoRoute: typeof AuthenticatedProjecaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedConfiguracoesAprovacoesRoute: typeof AuthenticatedConfiguracoesAprovacoesRoute
+  AuthenticatedConfiguracoesCobrancasRoute: typeof AuthenticatedConfiguracoesCobrancasRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
   AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
   AuthenticatedFinanceiroCartoesRoute: typeof AuthenticatedFinanceiroCartoesRoute
@@ -679,6 +700,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedConfiguracoesAprovacoesRoute:
     AuthenticatedConfiguracoesAprovacoesRoute,
+  AuthenticatedConfiguracoesCobrancasRoute:
+    AuthenticatedConfiguracoesCobrancasRoute,
   AuthenticatedConfiguracoesNotificacoesRoute:
     AuthenticatedConfiguracoesNotificacoesRoute,
   AuthenticatedFinanceiroCalendarioRoute:
