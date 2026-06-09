@@ -131,7 +131,13 @@ function ContasPagarPage() {
                 const overdue = isOverdue(c);
                 return (
                   <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.description}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{c.description}</span>
+                        <PaymentMethodBadge method={c.payment_method} />
+                        <RecurrenceBadge tx={c} />
+                      </div>
+                    </TableCell>
                     <TableCell>{formatDateBR(c.due_date)}</TableCell>
                     <TableCell className="text-right font-mono">{formatBRL(Number(c.amount))}</TableCell>
                     <TableCell>
