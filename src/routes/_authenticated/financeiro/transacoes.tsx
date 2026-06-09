@@ -33,6 +33,7 @@ import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
 import { AttachmentField, AttachmentBadge } from "@/components/financeiro/AttachmentField";
 import { Checkbox } from "@/components/ui/checkbox";
+import { approvalLimitsQuery, computeApprovalStatus, notifyAdminsPendingApproval } from "@/lib/approvals";
 
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
@@ -42,13 +43,14 @@ export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
 });
 
 function TransacoesPage() {
-  const { companyId } = useCurrentCompany();
+  const { companyId, profile, user } = useCurrentCompany();
   const qc = useQueryClient();
   const { data: transacoes = [] } = useQuery(transactionsQuery(companyId));
   const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
   const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
   const { data: costCenters = [] } = useQuery(costCentersQuery(companyId));
+  const { data: approvalLimits = [] } = useQuery(approvalLimitsQuery(companyId));
   const categorize = useServerFn(categorizeTransaction);
   const learnName = useServerFn(learnNameRule);
 
@@ -138,6 +140,7 @@ function TransacoesPage() {
       if (!companyId) throw new Error("Sem empresa");
       const amount = Number(form.amount.replace(",", "."));
       const installments = payment.payment_method === "credito" ? payment.card_installments : 1;
+      const approvalStatus = computeApprovalStatus(amount, profile?.role, approvalLimits);
       const base = {
         company_id: companyId,
         type: form.type,
@@ -150,6 +153,7 @@ function TransacoesPage() {
         category_auto_applied: autoApplied,
         payment_method: payment.payment_method || null,
         attachment_url: pendingAttachment,
+        approval_status: approvalStatus,
         // PIX
         pix_key_type: payment.pix_key_type || null,
         pix_key: payment.pix_key || null,
@@ -168,11 +172,26 @@ function TransacoesPage() {
         recurrence: form.recurrence,
         installments,
       });
-      return count;
+
+      if (approvalStatus === "aguardando_aprovacao" && user) {
+        await notifyAdminsPendingApproval({
+          companyId,
+          transactionId: "—",
+          description: form.description,
+          amount,
+          requesterName: profile?.full_name ?? user.email ?? "Usuário",
+        });
+      }
+      return { count, approvalStatus };
     },
-    onSuccess: (count) => {
+    onSuccess: ({ count, approvalStatus }) => {
       qc.invalidateQueries({ queryKey: ["transactions", companyId] });
-      toast.success(count > 1 ? `${count} lançamentos criados` : "Transação criada");
+      qc.invalidateQueries({ queryKey: ["notifications", companyId] });
+      if (approvalStatus === "aguardando_aprovacao") {
+        toast.warning("Lançamento criado e enviado para aprovação");
+      } else {
+        toast.success(count > 1 ? `${count} lançamentos criados` : "Transação criada");
+      }
       setOpen(false);
       resetForm();
     },
@@ -408,6 +427,12 @@ function TransacoesPage() {
                               {t.description}
                               <RecurrenceBadge tx={t} />
                               <AttachmentBadge path={t.attachment_url} />
+                              {t.approval_status === "aguardando_aprovacao" && (
+                                <Badge className="bg-amber-100 text-amber-800 text-[9px] px-1 py-0">⏳ Aguardando aprovação</Badge>
+                              )}
+                              {t.approval_status === "rejeitado" && (
+                                <Badge className="bg-rose-100 text-rose-800 text-[9px] px-1 py-0">✗ Rejeitado</Badge>
+                              )}
                               <button onClick={() => startEdit(t)}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
