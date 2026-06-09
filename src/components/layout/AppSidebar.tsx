@@ -12,6 +12,9 @@ import {
   ShoppingCart,
   Package,
   ChevronDown,
+  Tags,
+  Upload,
+  Wand2,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
