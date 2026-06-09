@@ -33,9 +33,7 @@ import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
 import { AttachmentField, AttachmentBadge } from "@/components/financeiro/AttachmentField";
 import { Checkbox } from "@/components/ui/checkbox";
-import { approvalLimitsQuery, computeApprovalStatus, notifyAdminsPendingApproval, approvalLogsQuery } from "@/lib/approvals";
-import { ApprovalTimeline } from "@/components/financeiro/ApprovalTimeline";
-import { Clock } from "lucide-react";
+import { approvalLimitsQuery, computeApprovalStatus, notifyAdminsPendingApproval } from "@/lib/approvals";
 
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
