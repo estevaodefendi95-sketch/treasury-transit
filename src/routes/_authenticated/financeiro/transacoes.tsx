@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,17 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Pencil, Sparkles, Loader2, Check, X } from "lucide-react";
+import { Plus, Search, Pencil, Sparkles, Loader2, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import {
   transactionsQuery, categoriesQuery, nameRulesQuery,
-  insertRow, updateRow,
+  updateRow,
   formatBRL, formatDateBR, statusLabel, todayISO,
   type Transaction,
 } from "@/lib/db";
 import { categorizeTransaction, learnNameRule } from "@/lib/ai.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { PaymentMethodFields, emptyPaymentFields, type PaymentFields } from "@/components/financeiro/PaymentMethodFields";
+import { PaymentMethodBadge, PaymentMethodDetails, PixReceiveBox } from "@/components/financeiro/PaymentMethodBadge";
+import { RecurrenceSelect, RecurrenceBadge } from "@/components/financeiro/RecurrenceSelect";
+import { RecurrenceScopeModal } from "@/components/financeiro/RecurrenceScopeModal";
+import type { Recurrence } from "@/lib/payment";
+import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
   ssr: false,
@@ -43,7 +49,9 @@ function TransacoesPage() {
     type: "expense" as "income" | "expense",
     description: "", amount: "", due_date: todayISO(),
     category_id: "" as string | null,
+    recurrence: "unico" as Recurrence,
   });
+  const [payment, setPayment] = useState<PaymentFields>(emptyPaymentFields);
   const [suggesting, setSuggesting] = useState(false);
   const [suggestion, setSuggestion] = useState<{ category_id: string | null; category_name: string | null; confidence: number; reason: string } | null>(null);
   const [autoApplied, setAutoApplied] = useState(false);
@@ -51,11 +59,13 @@ function TransacoesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
 
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+
   const filtered = transacoes.filter((t) =>
     t.description.toLowerCase().includes(filter.toLowerCase()),
   );
 
-  // Sugestão IA quando descrição + valor mudam (debounce)
   useEffect(() => {
     setSuggestion(null);
     setAutoApplied(false);
@@ -97,27 +107,52 @@ function TransacoesPage() {
     }
   };
 
+  const resetForm = () => {
+    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", recurrence: "unico" });
+    setPayment(emptyPaymentFields);
+    setSuggestion(null);
+    setAutoApplied(false);
+  };
+
   const create = useMutation({
     mutationFn: async () => {
       if (!companyId) throw new Error("Sem empresa");
-      return insertRow<Transaction>("transactions", {
+      const amount = Number(form.amount.replace(",", "."));
+      const installments = payment.payment_method === "credito" ? payment.card_installments : 1;
+      const base = {
         company_id: companyId,
         type: form.type,
         status: "pending",
         description: form.description,
-        amount: Number(form.amount.replace(",", ".")),
+        amount,
         due_date: form.due_date,
         category_id: form.category_id || null,
         category_auto_applied: autoApplied,
-      } as unknown as Transaction);
+        payment_method: payment.payment_method || null,
+        // PIX
+        pix_key_type: payment.pix_key_type || null,
+        pix_key: payment.pix_key || null,
+        pix_qr_code: payment.pix_qr_code || null,
+        // Boleto
+        boleto_barcode: payment.boleto_barcode || null,
+        linha_digitavel: payment.linha_digitavel || null,
+        boleto_due_date: payment.boleto_due_date || null,
+        // Cartão
+        card_brand: payment.card_brand || null,
+        card_installments: installments > 1 ? installments : null,
+        card_invoice_date: payment.card_invoice_date || null,
+      };
+      const count = await createTransactionSeries(base, {
+        recurrence: form.recurrence,
+        installments,
+      });
+      return count;
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       qc.invalidateQueries({ queryKey: ["transactions", companyId] });
-      toast.success("Transação criada");
+      toast.success(count > 1 ? `${count} lançamentos criados` : "Transação criada");
       setOpen(false);
-      setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "" });
-      setSuggestion(null);
-      setAutoApplied(false);
+      resetForm();
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -135,12 +170,10 @@ function TransacoesPage() {
         edited_description: editDraft,
         original_description: original,
       });
-      // Aprende regra se houve renomeação significativa
       if (original.toLowerCase() !== editDraft.toLowerCase() && original.length > 3) {
         try {
           const rule = await learnName({ data: { original, new_name: editDraft } });
           if (rule.confidence >= 0.5 && companyId) {
-            // checa se já existe regra parecida
             const exists = nameRules.find((r) => r.original_pattern.toLowerCase() === rule.pattern.toLowerCase());
             if (!exists) {
               await supabase.from("name_rules").insert({
@@ -165,7 +198,28 @@ function TransacoesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const performDelete = useMutation({
+    mutationFn: async ({ tx, scope }: { tx: Transaction; scope: "one" | "future" | "all" }) =>
+      deleteWithScope(tx, scope),
+    onSuccess: (count) => {
+      qc.invalidateQueries({ queryKey: ["transactions", companyId] });
+      toast.success(count > 1 ? `${count} lançamentos excluídos` : "Lançamento excluído");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const handleDeleteClick = (t: Transaction) => {
+    if (t.recurrence_group_id) {
+      setDeleteTarget(t);
+    } else {
+      if (confirm("Excluir este lançamento?")) {
+        performDelete.mutate({ tx: t, scope: "one" });
+      }
+    }
+  };
+
   const catById = (id: string | null) => categorias.find((c) => c.id === id);
+  const amountNum = Number((form.amount || "0").replace(",", ".")) || 0;
 
   return (
     <div className="space-y-6">
@@ -173,9 +227,9 @@ function TransacoesPage() {
         title="Transações"
         description="Todas as movimentações financeiras."
         actions={
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />Nova</Button></DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>Nova transação</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div className="space-y-2">
@@ -232,6 +286,14 @@ function TransacoesPage() {
                     </div>
                   )}
                 </div>
+
+                <PaymentMethodFields value={payment} amount={amountNum} onChange={setPayment} />
+
+                <RecurrenceSelect
+                  value={form.recurrence}
+                  onChange={(r) => setForm({ ...form, recurrence: r })}
+                />
+
                 <Button onClick={() => create.mutate()} disabled={create.isPending || !form.description || !form.amount} className="w-full">
                   {create.isPending ? "Salvando..." : "Criar"}
                 </Button>
@@ -255,75 +317,109 @@ function TransacoesPage() {
                 <TableHead>Data</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Categoria</TableHead>
-                <TableHead>Tipo</TableHead>
+                <TableHead>Pagamento</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">Nenhuma transação</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-6">Nenhuma transação</TableCell></TableRow>
               )}
               {filtered.map((t) => {
                 const cat = catById(t.category_id);
                 const isEditing = editingId === t.id;
+                const isExpanded = expandedId === t.id;
                 return (
-                  <TableRow key={t.id} className="group">
-                    <TableCell>{formatDateBR(t.payment_date ?? t.due_date)}</TableCell>
-                    <TableCell>
-                      {isEditing ? (
-                        <div className="flex gap-1 items-center">
-                          <Input className="h-7" value={editDraft} onChange={(e) => setEditDraft(e.target.value)} />
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit.mutate(t)} disabled={saveEdit.isPending}>
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingId(null)}>
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="font-medium flex items-center gap-1">
-                            {t.description}
-                            <button onClick={() => startEdit(t)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                            </button>
+                  <Fragment key={t.id}>
+                    <TableRow key={t.id} className="group">
+                      <TableCell>{formatDateBR(t.payment_date ?? t.due_date)}</TableCell>
+                      <TableCell>
+                        {isEditing ? (
+                          <div className="flex gap-1 items-center">
+                            <Input className="h-7" value={editDraft} onChange={(e) => setEditDraft(e.target.value)} />
+                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit.mutate(t)} disabled={saveEdit.isPending}>
+                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingId(null)}>
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
-                          {t.original_description && t.original_description !== t.description && (
-                            <div className="text-[10px] text-muted-foreground italic">{t.original_description}</div>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {cat ? (
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <span>{cat.icon}</span>
-                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color ?? "#64748b" }} />
-                          <span>{cat.name}</span>
-                          {t.category_auto_applied && (
-                            <Badge variant="outline" className="text-[9px] px-1 py-0 bg-primary/5">IA</Badge>
-                          )}
-                        </div>
-                      ) : <span className="text-xs text-muted-foreground">—</span>}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={t.type === "income" ? "default" : "secondary"}>
-                        {t.type === "income" ? "Receita" : "Despesa"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{statusLabel(t.status)}</TableCell>
-                    <TableCell className={`text-right font-mono ${t.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
-                      {t.type === "income" ? "+" : "-"} {formatBRL(Number(t.amount))}
-                    </TableCell>
-                  </TableRow>
+                        ) : (
+                          <div>
+                            <div className="font-medium flex items-center gap-1 flex-wrap">
+                              {t.description}
+                              <RecurrenceBadge tx={t} />
+                              <button onClick={() => startEdit(t)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                              </button>
+                            </div>
+                            {t.original_description && t.original_description !== t.description && (
+                              <div className="text-[10px] text-muted-foreground italic">{t.original_description}</div>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {cat ? (
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span>{cat.icon}</span>
+                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color ?? "#64748b" }} />
+                            <span>{cat.name}</span>
+                            {t.category_auto_applied && (
+                              <Badge variant="outline" className="text-[9px] px-1 py-0 bg-primary/5">IA</Badge>
+                            )}
+                          </div>
+                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedId(isExpanded ? null : t.id)}
+                          className="text-left"
+                        >
+                          <PaymentMethodBadge method={t.payment_method} />
+                          {!t.payment_method && <span className="text-xs text-muted-foreground">—</span>}
+                        </button>
+                      </TableCell>
+                      <TableCell>{statusLabel(t.status)}</TableCell>
+                      <TableCell className={`text-right font-mono ${t.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
+                        {t.type === "income" ? "+" : "-"} {formatBRL(Number(t.amount))}
+                      </TableCell>
+                      <TableCell>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100"
+                          onClick={() => handleDeleteClick(t)}>
+                          <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                    {isExpanded && (
+                      <TableRow key={`${t.id}-details`} className="bg-muted/20">
+                        <TableCell colSpan={7} className="py-2">
+                          <PixReceiveBox tx={t} />
+                          <PaymentMethodDetails tx={t} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <RecurrenceScopeModal
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Excluir lançamento recorrente"
+        description="Esta transação faz parte de uma série. O que deseja excluir?"
+        confirmLabel="Excluir"
+        destructive
+        onConfirm={(scope) => deleteTarget && performDelete.mutate({ tx: deleteTarget, scope })}
+      />
     </div>
   );
 }

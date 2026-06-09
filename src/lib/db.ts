@@ -61,6 +61,20 @@ export type Transaction = {
   category_auto_applied?: boolean | null;
   bank_statement_import_id?: string | null;
   created_at?: string;
+  // Pagamento — PIX
+  pix_key_type?: string | null;
+  pix_key?: string | null;
+  pix_qr_code?: string | null;
+  // Pagamento — Boleto
+  boleto_barcode?: string | null;
+  linha_digitavel?: string | null;
+  boleto_due_date?: string | null;
+  // Pagamento — Cartão
+  card_brand?: string | null;
+  card_installments?: number | null;
+  card_invoice_date?: string | null;
+  // Recorrência
+  recurrence_interval_months?: number | null;
 };
 
 export type Customer = {
