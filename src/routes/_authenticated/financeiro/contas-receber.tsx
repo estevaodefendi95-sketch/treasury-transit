@@ -16,6 +16,8 @@ import {
   transactionsQuery, customersQuery, insertRow, updateRow,
   formatBRL, formatDateBR, statusLabel, isOverdue, todayISO, type Transaction,
 } from "@/lib/db";
+import { PaymentMethodBadge } from "@/components/financeiro/PaymentMethodBadge";
+import { RecurrenceBadge } from "@/components/financeiro/RecurrenceSelect";
 
 export const Route = createFileRoute("/_authenticated/financeiro/contas-receber")({
   ssr: false,
