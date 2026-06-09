@@ -173,3 +173,52 @@ Não use marcadores, numeração ou títulos. Apenas 3 frases corridas.`,
       };
     }
   });
+
+// ---------- 5) Mensagem de cobrança WhatsApp ----------
+const ChargingInput = z.object({
+  customer_name: z.string().min(1),
+  amount: z.number(),
+  due_date: z.string(),
+  days_overdue: z.number().int(),
+  company_name: z.string().optional(),
+});
+
+export const chargingMessage = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => ChargingInput.parse(d))
+  .handler(async ({ data }) => {
+    const fmt = (n: number) =>
+      n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const due = data.due_date
+      ? (() => {
+          const [y, m, d] = data.due_date.split("-");
+          return `${d}/${m}/${y}`;
+        })()
+      : "—";
+    const status =
+      data.days_overdue > 0
+        ? `em atraso há ${data.days_overdue} dia(s)`
+        : data.days_overdue === 0
+          ? "que vence hoje"
+          : `que vencerá em ${Math.abs(data.days_overdue)} dia(s)`;
+    try {
+      const { text } = await generateText({
+        model: getModel(),
+        system:
+          "Você gera mensagens de cobrança em português do Brasil para WhatsApp. Tom profissional, educado mas firme. Máximo 3 frases curtas. Sem emojis excessivos (no máximo 1).",
+        prompt: `Gere uma mensagem de cobrança para WhatsApp.
+Cliente: ${data.customer_name}
+Valor: ${fmt(data.amount)}
+Vencimento: ${due}
+Situação: ${status}
+${data.company_name ? `Empresa: ${data.company_name}` : ""}
+
+Comece com "Olá, ${data.customer_name}!" e termine se colocando à disposição. Apenas o texto da mensagem, sem aspas ou explicações.`,
+      });
+      return { message: text.trim() };
+    } catch (e) {
+      console.error("chargingMessage error", e);
+      return {
+        message: `Olá, ${data.customer_name}! Identificamos uma pendência de ${fmt(data.amount)} com vencimento em ${due}. Por favor, regularize ou entre em contato. Obrigado!`,
+      };
+    }
+  });
