@@ -19,8 +19,11 @@ import {
   CreditCard,
   Building2,
   Bell,
+  ClipboardCheck,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
+import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -64,6 +67,8 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { profile } = useCurrentCompany();
+  const isAdmin = profile?.role === "admin";
   const isActive = (url: string) => pathname === url;
   const isInGroup = (items: { url: string }[]) => items.some((i) => pathname.startsWith(i.url));
 
@@ -107,6 +112,24 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/relatorios")}>
+                  <Link to="/relatorios">
+                    <BarChart3 className="h-4 w-4" />
+                    {!collapsed && <span>Relatórios</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith("/aprovacoes")}>
+                    <Link to="/aprovacoes">
+                      <ClipboardCheck className="h-4 w-4" />
+                      {!collapsed && <span>Aprovações</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
 
           </SidebarGroupContent>
