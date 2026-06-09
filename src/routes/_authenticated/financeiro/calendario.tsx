@@ -129,6 +129,7 @@ function CalendarioPage() {
               const totalIn = items.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
               const totalOut = items.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
               const balance = totalIn - totalOut;
+              const hasRecurring = items.some((t) => t.recurrence && t.recurrence !== "unico");
               const isToday = day !== null && isCurrentMonth && day === today.getDate();
               return (
                 <button
@@ -136,15 +137,19 @@ function CalendarioPage() {
                   disabled={day === null}
                   onClick={() => day && setSelectedDay(String(day))}
                   className={cn(
-                    "min-h-[88px] rounded-md border border-border p-1.5 text-[10px] text-left transition-colors",
+                    "min-h-[88px] rounded-md border border-border p-1.5 text-[10px] text-left transition-colors relative",
                     day === null && "bg-muted/30 border-transparent cursor-default",
                     day !== null && "hover:bg-accent cursor-pointer",
                     isToday && "border-primary border-2",
                   )}
+                  title={hasRecurring ? "Contém lançamento recorrente" : undefined}
                 >
                   {day && (
                     <>
-                      <div className="font-semibold text-foreground mb-1">{day}</div>
+                      <div className="font-semibold text-foreground mb-1 flex items-center gap-1">
+                        <span>{day}</span>
+                        {hasRecurring && <span className="text-amber-600 text-[10px]">↻</span>}
+                      </div>
                       {totalIn > 0 && (
                         <div className="bg-emerald-100 text-emerald-700 rounded px-1 py-0.5 truncate mb-0.5">
                           +{formatBRL(totalIn)}
