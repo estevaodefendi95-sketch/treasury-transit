@@ -40,8 +40,11 @@ const financeiroItems = [
   { title: "Contas a Pagar", url: "/financeiro/contas-pagar", icon: ArrowUpCircle },
   { title: "Contas a Receber", url: "/financeiro/contas-receber", icon: ArrowDownCircle },
   { title: "Fluxo de Caixa", url: "/financeiro/fluxo-caixa", icon: TrendingUp },
+  { title: "Categorias", url: "/financeiro/categorias", icon: Tags },
+  { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
+  { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
-];
+] as const;
 
 const vendasItems = [
   { title: "Clientes", url: "/vendas/clientes", icon: Users },
