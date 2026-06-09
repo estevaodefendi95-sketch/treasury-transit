@@ -21,6 +21,7 @@ import {
   Bell,
   ClipboardCheck,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
