@@ -78,6 +78,29 @@ function DashboardPage() {
               </CardContent>
             </Card>
           )}
+          {projection30 && projection30.daysToNegative !== null && (
+            <Card className="border-rose-300 bg-rose-50">
+              <CardContent className="pt-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6 text-rose-700" />
+                  <div>
+                    <div className="font-semibold text-rose-900">
+                      ⚠️ Saldo projetado negativo em {projection30.daysToNegative} dia{projection30.daysToNegative === 1 ? "" : "s"}
+                    </div>
+                    <div className="text-xs text-rose-800">
+                      Projeção em 30d: {formatBRL(projection30.projectedBalance)}
+                    </div>
+                  </div>
+                </div>
+                <Button asChild variant="default" size="sm" className="bg-rose-600 hover:bg-rose-700">
+                  <Link to="/projecao">
+                    <Sparkles className="h-3.5 w-3.5 mr-1" />
+                    Ver projeção
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {kpis.map((k) => (
               <Card key={k.label} className="overflow-hidden">
