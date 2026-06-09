@@ -39,6 +39,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 const financeiroItems = [
   { title: "Calendário", url: "/financeiro/calendario", icon: Calendar },
   { title: "Transações", url: "/financeiro/transacoes", icon: ArrowLeftRight },
+  { title: "Contas Bancárias", url: "/financeiro/contas-bancarias", icon: Landmark },
+  { title: "Cartões", url: "/financeiro/cartoes", icon: CreditCard },
   { title: "Contas a Pagar", url: "/financeiro/contas-pagar", icon: ArrowUpCircle },
   { title: "Contas a Receber", url: "/financeiro/contas-receber", icon: ArrowDownCircle },
   { title: "Fluxo de Caixa", url: "/financeiro/fluxo-caixa", icon: TrendingUp },
