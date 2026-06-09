@@ -52,7 +52,7 @@ function ProdutosPage() {
       <PageHeader
         title="Produtos"
         description={`${produtos.length} cadastrado(s).`}
-        action={
+        actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />Novo produto</Button></DialogTrigger>
             <DialogContent>

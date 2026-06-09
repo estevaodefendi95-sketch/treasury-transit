@@ -62,7 +62,7 @@ function TransacoesPage() {
       <PageHeader
         title="Transações"
         description="Todas as movimentações financeiras."
-        action={
+        actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />Nova</Button></DialogTrigger>
             <DialogContent>

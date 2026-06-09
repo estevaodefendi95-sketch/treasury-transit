@@ -71,7 +71,7 @@ function ContasReceberPage() {
       <PageHeader
         title="Contas a Receber"
         description={`Total em aberto: ${formatBRL(total)}`}
-        action={
+        actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-1" />Nova conta</Button>

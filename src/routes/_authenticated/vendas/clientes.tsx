@@ -56,7 +56,7 @@ function ClientesPage() {
       <PageHeader
         title="Clientes"
         description={`${clientes.length} cadastrado(s).`}
-        action={
+        actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />Novo cliente</Button></DialogTrigger>
             <DialogContent>
