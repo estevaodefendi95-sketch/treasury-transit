@@ -9,38 +9,226 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
+import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
+import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
+import { Route as AuthenticatedFinanceiroTransacoesRouteImport } from './routes/_authenticated/financeiro/transacoes'
+import { Route as AuthenticatedFinanceiroFluxoCaixaRouteImport } from './routes/_authenticated/financeiro/fluxo-caixa'
+import { Route as AuthenticatedFinanceiroContasReceberRouteImport } from './routes/_authenticated/financeiro/contas-receber'
+import { Route as AuthenticatedFinanceiroContasPagarRouteImport } from './routes/_authenticated/financeiro/contas-pagar'
+import { Route as AuthenticatedFinanceiroConciliacaoRouteImport } from './routes/_authenticated/financeiro/conciliacao'
+import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedVendasProdutosRoute =
+  AuthenticatedVendasProdutosRouteImport.update({
+    id: '/vendas/produtos',
+    path: '/vendas/produtos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedVendasPedidosRoute =
+  AuthenticatedVendasPedidosRouteImport.update({
+    id: '/vendas/pedidos',
+    path: '/vendas/pedidos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedVendasClientesRoute =
+  AuthenticatedVendasClientesRouteImport.update({
+    id: '/vendas/clientes',
+    path: '/vendas/clientes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroTransacoesRoute =
+  AuthenticatedFinanceiroTransacoesRouteImport.update({
+    id: '/financeiro/transacoes',
+    path: '/financeiro/transacoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroFluxoCaixaRoute =
+  AuthenticatedFinanceiroFluxoCaixaRouteImport.update({
+    id: '/financeiro/fluxo-caixa',
+    path: '/financeiro/fluxo-caixa',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroContasReceberRoute =
+  AuthenticatedFinanceiroContasReceberRouteImport.update({
+    id: '/financeiro/contas-receber',
+    path: '/financeiro/contas-receber',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroContasPagarRoute =
+  AuthenticatedFinanceiroContasPagarRouteImport.update({
+    id: '/financeiro/contas-pagar',
+    path: '/financeiro/contas-pagar',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroConciliacaoRoute =
+  AuthenticatedFinanceiroConciliacaoRouteImport.update({
+    id: '/financeiro/conciliacao',
+    path: '/financeiro/conciliacao',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroCalendarioRoute =
+  AuthenticatedFinanceiroCalendarioRouteImport.update({
+    id: '/financeiro/calendario',
+    path: '/financeiro/calendario',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/onboarding': typeof OnboardingRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
+  '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
+  '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
+  '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
+  '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/onboarding': typeof OnboardingRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
+  '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
+  '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
+  '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
+  '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/onboarding': typeof OnboardingRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
+  '/_authenticated/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/_authenticated/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
+  '/_authenticated/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
+  '/_authenticated/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/_authenticated/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
+  '/_authenticated/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
+  '/_authenticated/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/dashboard'
+    | '/financeiro/calendario'
+    | '/financeiro/conciliacao'
+    | '/financeiro/contas-pagar'
+    | '/financeiro/contas-receber'
+    | '/financeiro/fluxo-caixa'
+    | '/financeiro/transacoes'
+    | '/vendas/clientes'
+    | '/vendas/pedidos'
+    | '/vendas/produtos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/dashboard'
+    | '/financeiro/calendario'
+    | '/financeiro/conciliacao'
+    | '/financeiro/contas-pagar'
+    | '/financeiro/contas-receber'
+    | '/financeiro/fluxo-caixa'
+    | '/financeiro/transacoes'
+    | '/vendas/clientes'
+    | '/vendas/pedidos'
+    | '/vendas/produtos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/onboarding'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/financeiro/calendario'
+    | '/_authenticated/financeiro/conciliacao'
+    | '/_authenticated/financeiro/contas-pagar'
+    | '/_authenticated/financeiro/contas-receber'
+    | '/_authenticated/financeiro/fluxo-caixa'
+    | '/_authenticated/financeiro/transacoes'
+    | '/_authenticated/vendas/clientes'
+    | '/_authenticated/vendas/pedidos'
+    | '/_authenticated/vendas/produtos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +236,121 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/vendas/produtos': {
+      id: '/_authenticated/vendas/produtos'
+      path: '/vendas/produtos'
+      fullPath: '/vendas/produtos'
+      preLoaderRoute: typeof AuthenticatedVendasProdutosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/vendas/pedidos': {
+      id: '/_authenticated/vendas/pedidos'
+      path: '/vendas/pedidos'
+      fullPath: '/vendas/pedidos'
+      preLoaderRoute: typeof AuthenticatedVendasPedidosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/vendas/clientes': {
+      id: '/_authenticated/vendas/clientes'
+      path: '/vendas/clientes'
+      fullPath: '/vendas/clientes'
+      preLoaderRoute: typeof AuthenticatedVendasClientesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/transacoes': {
+      id: '/_authenticated/financeiro/transacoes'
+      path: '/financeiro/transacoes'
+      fullPath: '/financeiro/transacoes'
+      preLoaderRoute: typeof AuthenticatedFinanceiroTransacoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/fluxo-caixa': {
+      id: '/_authenticated/financeiro/fluxo-caixa'
+      path: '/financeiro/fluxo-caixa'
+      fullPath: '/financeiro/fluxo-caixa'
+      preLoaderRoute: typeof AuthenticatedFinanceiroFluxoCaixaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/contas-receber': {
+      id: '/_authenticated/financeiro/contas-receber'
+      path: '/financeiro/contas-receber'
+      fullPath: '/financeiro/contas-receber'
+      preLoaderRoute: typeof AuthenticatedFinanceiroContasReceberRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/contas-pagar': {
+      id: '/_authenticated/financeiro/contas-pagar'
+      path: '/financeiro/contas-pagar'
+      fullPath: '/financeiro/contas-pagar'
+      preLoaderRoute: typeof AuthenticatedFinanceiroContasPagarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/conciliacao': {
+      id: '/_authenticated/financeiro/conciliacao'
+      path: '/financeiro/conciliacao'
+      fullPath: '/financeiro/conciliacao'
+      preLoaderRoute: typeof AuthenticatedFinanceiroConciliacaoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/calendario': {
+      id: '/_authenticated/financeiro/calendario'
+      path: '/financeiro/calendario'
+      fullPath: '/financeiro/calendario'
+      preLoaderRoute: typeof AuthenticatedFinanceiroCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
+  AuthenticatedFinanceiroConciliacaoRoute: typeof AuthenticatedFinanceiroConciliacaoRoute
+  AuthenticatedFinanceiroContasPagarRoute: typeof AuthenticatedFinanceiroContasPagarRoute
+  AuthenticatedFinanceiroContasReceberRoute: typeof AuthenticatedFinanceiroContasReceberRoute
+  AuthenticatedFinanceiroFluxoCaixaRoute: typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  AuthenticatedFinanceiroTransacoesRoute: typeof AuthenticatedFinanceiroTransacoesRoute
+  AuthenticatedVendasClientesRoute: typeof AuthenticatedVendasClientesRoute
+  AuthenticatedVendasPedidosRoute: typeof AuthenticatedVendasPedidosRoute
+  AuthenticatedVendasProdutosRoute: typeof AuthenticatedVendasProdutosRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFinanceiroCalendarioRoute:
+    AuthenticatedFinanceiroCalendarioRoute,
+  AuthenticatedFinanceiroConciliacaoRoute:
+    AuthenticatedFinanceiroConciliacaoRoute,
+  AuthenticatedFinanceiroContasPagarRoute:
+    AuthenticatedFinanceiroContasPagarRoute,
+  AuthenticatedFinanceiroContasReceberRoute:
+    AuthenticatedFinanceiroContasReceberRoute,
+  AuthenticatedFinanceiroFluxoCaixaRoute:
+    AuthenticatedFinanceiroFluxoCaixaRoute,
+  AuthenticatedFinanceiroTransacoesRoute:
+    AuthenticatedFinanceiroTransacoesRoute,
+  AuthenticatedVendasClientesRoute: AuthenticatedVendasClientesRoute,
+  AuthenticatedVendasPedidosRoute: AuthenticatedVendasPedidosRoute,
+  AuthenticatedVendasProdutosRoute: AuthenticatedVendasProdutosRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
