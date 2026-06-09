@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedProjecaoRouteImport } from './routes/_authenticated/projecao'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
@@ -59,6 +60,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProjecaoRoute = AuthenticatedProjecaoRouteImport.update({
+  id: '/projecao',
+  path: '/projecao',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificacoesRoute =
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/projecao': typeof AuthenticatedProjecaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/projecao': typeof AuthenticatedProjecaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/_authenticated/projecao': typeof AuthenticatedProjecaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/_authenticated/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
     | '/aprovacoes'
     | '/dashboard'
     | '/notificacoes'
+    | '/projecao'
     | '/relatorios'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/aprovacoes'
     | '/dashboard'
     | '/notificacoes'
+    | '/projecao'
     | '/relatorios'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/aprovacoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/notificacoes'
+    | '/_authenticated/projecao'
     | '/_authenticated/relatorios'
     | '/_authenticated/centros-de-custo/relatorio'
     | '/_authenticated/configuracoes/aprovacoes'
@@ -406,6 +418,13 @@ declare module '@tanstack/react-router' {
       path: '/relatorios'
       fullPath: '/relatorios'
       preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projecao': {
+      id: '/_authenticated/projecao'
+      path: '/projecao'
+      fullPath: '/projecao'
+      preLoaderRoute: typeof AuthenticatedProjecaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notificacoes': {
@@ -588,6 +607,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
+  AuthenticatedProjecaoRoute: typeof AuthenticatedProjecaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedConfiguracoesAprovacoesRoute: typeof AuthenticatedConfiguracoesAprovacoesRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
@@ -613,6 +633,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
+  AuthenticatedProjecaoRoute: AuthenticatedProjecaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedConfiguracoesAprovacoesRoute:
     AuthenticatedConfiguracoesAprovacoesRoute,

@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, AlertCircle, ClipboardCheck, Sparkles, AlertTriangle } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend } from "recharts";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { transactionsQuery, formatBRL, isOverdue, type Transaction } from "@/lib/db";
+import { computeProjection } from "@/lib/projection";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   ssr: false,
@@ -19,6 +20,7 @@ function DashboardPage() {
   const { data: transacoes = [], isLoading } = useQuery(transactionsQuery(companyId));
   const isAdmin = profile?.role === "admin";
   const pendingApprovals = transacoes.filter((t) => t.approval_status === "aguardando_aprovacao");
+  const projection30 = transacoes.length > 0 ? computeProjection(transacoes, 30) : null;
 
   const receitas = transacoes.filter((t) => t.type === "income" && (t.status === "received" || t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
   const despesas = transacoes.filter((t) => t.type === "expense" && (t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
@@ -72,6 +74,29 @@ function DashboardPage() {
                 </div>
                 <Button asChild variant="default" size="sm" className="bg-amber-600 hover:bg-amber-700">
                   <Link to="/aprovacoes">Revisar fila</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          {projection30 && projection30.daysToNegative !== null && (
+            <Card className="border-rose-300 bg-rose-50">
+              <CardContent className="pt-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6 text-rose-700" />
+                  <div>
+                    <div className="font-semibold text-rose-900">
+                      ⚠️ Saldo projetado negativo em {projection30.daysToNegative} dia{projection30.daysToNegative === 1 ? "" : "s"}
+                    </div>
+                    <div className="text-xs text-rose-800">
+                      Projeção em 30d: {formatBRL(projection30.projectedBalance)}
+                    </div>
+                  </div>
+                </div>
+                <Button asChild variant="default" size="sm" className="bg-rose-600 hover:bg-rose-700">
+                  <Link to="/projecao">
+                    <Sparkles className="h-3.5 w-3.5 mr-1" />
+                    Ver projeção
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

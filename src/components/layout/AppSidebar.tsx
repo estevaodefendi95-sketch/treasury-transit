@@ -21,6 +21,7 @@ import {
   Bell,
   ClipboardCheck,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
@@ -117,6 +118,14 @@ export function AppSidebar() {
                   <Link to="/relatorios">
                     <BarChart3 className="h-4 w-4" />
                     {!collapsed && <span>Relatórios</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/projecao")}>
+                  <Link to="/projecao">
+                    <Sparkles className="h-4 w-4" />
+                    {!collapsed && <span>Projeção IA</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

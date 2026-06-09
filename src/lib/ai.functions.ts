@@ -129,3 +129,47 @@ Gere uma regra reutilizável.`,
     });
     return output;
   });
+
+// ---------- 4) Narrativa de Fluxo de Caixa ----------
+const CashflowInput = z.object({
+  days: z.number().int().positive(),
+  current_balance: z.number(),
+  scheduled_receivables: z.number(),
+  scheduled_payables: z.number(),
+  overdue_receivables: z.number(),
+  projected_balance: z.number(),
+});
+
+export const cashflowNarrative = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => CashflowInput.parse(d))
+  .handler(async ({ data }) => {
+    const fmt = (n: number) =>
+      n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    try {
+      const { text } = await generateText({
+        model: getModel(),
+        system:
+          "Você é um consultor financeiro brasileiro para PMEs. Seja conciso e prático. Responda SEMPRE em português do Brasil.",
+        prompt: `Analise este fluxo de caixa para os próximos ${data.days} dias:
+Saldo atual: ${fmt(data.current_balance)}
+Recebíveis programados: ${fmt(data.scheduled_receivables)}
+Pagamentos programados: ${fmt(data.scheduled_payables)}
+Recebíveis em atraso: ${fmt(data.overdue_receivables)}
+Saldo projetado em ${data.days} dias: ${fmt(data.projected_balance)}
+
+Escreva EXATAMENTE 3 frases curtas em português:
+1. Avaliação da saúde financeira atual.
+2. Principal risco ou oportunidade identificada.
+3. Uma recomendação prática e específica.
+
+Não use marcadores, numeração ou títulos. Apenas 3 frases corridas.`,
+      });
+      return { narrative: text.trim() };
+    } catch (e) {
+      console.error("cashflowNarrative error", e);
+      return {
+        narrative:
+          "Não foi possível gerar a análise no momento. Verifique sua conexão e tente novamente.",
+      };
+    }
+  });
