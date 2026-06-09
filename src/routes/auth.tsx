@@ -1,13 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
-import { useAuthStore } from "@/store/useStore";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -21,8 +20,14 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuthStore();
   const [loading, setLoading] = useState(false);
+
+  // Redireciona se já estiver autenticado
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) navigate({ to: "/dashboard" });
+    });
+  }, [navigate]);
 
   // Login
   const [loginEmail, setLoginEmail] = useState("");
@@ -33,20 +38,10 @@ function AuthPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regPass, setRegPass] = useState("");
 
-  const fakeLogin = () => {
-    setUser({ id: "demo", email: loginEmail || "demo@suaempresa.com.br", nome: "Usuário Demo" });
-    toast.success("Bem-vindo! (modo demonstração)");
-    navigate({ to: "/dashboard" });
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isSupabaseConfigured) {
-      fakeLogin();
-      return;
-    }
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: loginEmail,
       password: loginPass,
     });
@@ -55,31 +50,18 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    if (data.user) {
-      setUser({
-        id: data.user.id,
-        email: data.user.email ?? "",
-        nome: data.user.user_metadata?.nome ?? data.user.email?.split("@")[0] ?? "Usuário",
-      });
-      toast.success("Login realizado!");
-      navigate({ to: "/dashboard" });
-    }
+    toast.success("Login realizado!");
+    navigate({ to: "/dashboard" });
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isSupabaseConfigured) {
-      setUser({ id: "demo", email: regEmail, nome: regNome });
-      toast.success("Conta criada! (modo demonstração)");
-      navigate({ to: "/onboarding" });
-      return;
-    }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: regEmail,
       password: regPass,
       options: {
-        data: { nome: regNome },
+        data: { full_name: regNome },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     });
@@ -89,9 +71,10 @@ function AuthPage() {
       return;
     }
     if (data.user) {
-      setUser({ id: data.user.id, email: data.user.email ?? regEmail, nome: regNome });
-      toast.success("Conta criada!");
+      toast.success("Conta criada! Configure sua empresa.");
       navigate({ to: "/onboarding" });
+    } else {
+      toast.success("Verifique seu e-mail para confirmar a conta.");
     }
   };
 
@@ -105,7 +88,6 @@ function AuthPage() {
           <h1 className="text-2xl font-bold text-foreground">SuaEmpresa Gestão</h1>
           <p className="text-sm text-muted-foreground">ERP financeiro para sua empresa</p>
         </div>
-
         <Card>
           <Tabs defaultValue="login" className="w-full">
             <CardHeader>
@@ -114,7 +96,6 @@ function AuthPage() {
                 <TabsTrigger value="register">Criar conta</TabsTrigger>
               </TabsList>
             </CardHeader>
-
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4">
@@ -130,15 +111,9 @@ function AuthPage() {
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Entrando..." : "Entrar"}
                   </Button>
-                  {!isSupabaseConfigured && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      Modo demonstração ativo. Configure o Supabase em <code className="bg-muted px-1 rounded">src/integrations/supabase/client.ts</code>.
-                    </p>
-                  )}
                 </CardContent>
               </form>
             </TabsContent>
-
             <TabsContent value="register">
               <form onSubmit={handleRegister}>
                 <CardContent className="space-y-4">
@@ -152,7 +127,7 @@ function AuthPage() {
                     <Input id="regemail" type="email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="regpass">Senha</Label>
+                    <Label htmlFor="regpass">Senha (mín. 6 caracteres)</Label>
                     <Input id="regpass" type="password" required minLength={6} value={regPass} onChange={(e) => setRegPass(e.target.value)} />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
