@@ -19,6 +19,7 @@ import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authen
 import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
 import { Route as AuthenticatedFinanceiroTransacoesRouteImport } from './routes/_authenticated/financeiro/transacoes'
 import { Route as AuthenticatedFinanceiroRegrasNomesRouteImport } from './routes/_authenticated/financeiro/regras-nomes'
+import { Route as AuthenticatedFinanceiroImportarRouteImport } from './routes/_authenticated/financeiro/importar'
 import { Route as AuthenticatedFinanceiroFluxoCaixaRouteImport } from './routes/_authenticated/financeiro/fluxo-caixa'
 import { Route as AuthenticatedFinanceiroContasReceberRouteImport } from './routes/_authenticated/financeiro/contas-receber'
 import { Route as AuthenticatedFinanceiroContasPagarRouteImport } from './routes/_authenticated/financeiro/contas-pagar'
@@ -80,6 +81,12 @@ const AuthenticatedFinanceiroRegrasNomesRoute =
     path: '/financeiro/regras-nomes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinanceiroImportarRoute =
+  AuthenticatedFinanceiroImportarRouteImport.update({
+    id: '/financeiro/importar',
+    path: '/financeiro/importar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceiroFluxoCaixaRoute =
   AuthenticatedFinanceiroFluxoCaixaRouteImport.update({
     id: '/financeiro/fluxo-caixa',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
@@ -164,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/financeiro/contas-pagar': typeof AuthenticatedFinanceiroContasPagarRoute
   '/_authenticated/financeiro/contas-receber': typeof AuthenticatedFinanceiroContasReceberRoute
   '/_authenticated/financeiro/fluxo-caixa': typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  '/_authenticated/financeiro/importar': typeof AuthenticatedFinanceiroImportarRoute
   '/_authenticated/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/_authenticated/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
   '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/financeiro/contas-pagar'
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
+    | '/financeiro/importar'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
     | '/vendas/clientes'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/financeiro/contas-pagar'
     | '/financeiro/contas-receber'
     | '/financeiro/fluxo-caixa'
+    | '/financeiro/importar'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
     | '/vendas/clientes'
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro/contas-pagar'
     | '/_authenticated/financeiro/contas-receber'
     | '/_authenticated/financeiro/fluxo-caixa'
+    | '/_authenticated/financeiro/importar'
     | '/_authenticated/financeiro/regras-nomes'
     | '/_authenticated/financeiro/transacoes'
     | '/_authenticated/vendas/clientes'
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroRegrasNomesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financeiro/importar': {
+      id: '/_authenticated/financeiro/importar'
+      path: '/financeiro/importar'
+      fullPath: '/financeiro/importar'
+      preLoaderRoute: typeof AuthenticatedFinanceiroImportarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financeiro/fluxo-caixa': {
       id: '/_authenticated/financeiro/fluxo-caixa'
       path: '/financeiro/fluxo-caixa'
@@ -357,6 +377,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceiroContasPagarRoute: typeof AuthenticatedFinanceiroContasPagarRoute
   AuthenticatedFinanceiroContasReceberRoute: typeof AuthenticatedFinanceiroContasReceberRoute
   AuthenticatedFinanceiroFluxoCaixaRoute: typeof AuthenticatedFinanceiroFluxoCaixaRoute
+  AuthenticatedFinanceiroImportarRoute: typeof AuthenticatedFinanceiroImportarRoute
   AuthenticatedFinanceiroRegrasNomesRoute: typeof AuthenticatedFinanceiroRegrasNomesRoute
   AuthenticatedFinanceiroTransacoesRoute: typeof AuthenticatedFinanceiroTransacoesRoute
   AuthenticatedVendasClientesRoute: typeof AuthenticatedVendasClientesRoute
@@ -378,6 +399,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedFinanceiroContasReceberRoute,
   AuthenticatedFinanceiroFluxoCaixaRoute:
     AuthenticatedFinanceiroFluxoCaixaRoute,
+  AuthenticatedFinanceiroImportarRoute: AuthenticatedFinanceiroImportarRoute,
   AuthenticatedFinanceiroRegrasNomesRoute:
     AuthenticatedFinanceiroRegrasNomesRoute,
   AuthenticatedFinanceiroTransacoesRoute:
@@ -399,3 +421,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
