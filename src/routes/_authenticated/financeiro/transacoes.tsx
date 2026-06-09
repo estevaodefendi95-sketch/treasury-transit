@@ -18,6 +18,7 @@ import {
   updateRow,
   formatBRL, formatDateBR, statusLabel, todayISO,
   type Transaction,
+  costCentersQuery,
 } from "@/lib/db";
 import { categorizeTransaction, learnNameRule } from "@/lib/ai.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,9 @@ import { ArrowRightLeft } from "lucide-react";
 import { RecurrenceScopeModal } from "@/components/financeiro/RecurrenceScopeModal";
 import type { Recurrence } from "@/lib/payment";
 import { createTransactionSeries, deleteWithScope } from "@/lib/transactionSeries";
+import { AttachmentField, AttachmentBadge } from "@/components/financeiro/AttachmentField";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 export const Route = createFileRoute("/_authenticated/financeiro/transacoes")({
   ssr: false,
