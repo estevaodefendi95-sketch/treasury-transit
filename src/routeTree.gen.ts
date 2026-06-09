@@ -32,6 +32,7 @@ import { Route as AuthenticatedFinanceiroCategoriasRouteImport } from './routes/
 import { Route as AuthenticatedFinanceiroCartoesRouteImport } from './routes/_authenticated/financeiro/cartoes'
 import { Route as AuthenticatedFinanceiroCalendarioRouteImport } from './routes/_authenticated/financeiro/calendario'
 import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './routes/_authenticated/configuracoes/notificacoes'
+import { Route as AuthenticatedCentrosDeCustoRelatorioRouteImport } from './routes/_authenticated/centros-de-custo/relatorio'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -165,6 +166,12 @@ const AuthenticatedConfiguracoesNotificacoesRoute =
     path: '/configuracoes/notificacoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCentrosDeCustoRelatorioRoute =
+  AuthenticatedCentrosDeCustoRelatorioRouteImport.update({
+    id: '/relatorio',
+    path: '/relatorio',
+    getParentRoute: () => AuthenticatedCentrosDeCustoRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -196,6 +204,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -222,6 +231,7 @@ export interface FileRoutesById {
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/_authenticated/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/_authenticated/financeiro/calendario': typeof AuthenticatedFinanceiroCalendarioRoute
   '/_authenticated/financeiro/cartoes': typeof AuthenticatedFinanceiroCartoesRoute
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/centros-de-custo'
     | '/dashboard'
     | '/notificacoes'
+    | '/centros-de-custo/relatorio'
     | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/dashboard'
     | '/notificacoes'
+    | '/centros-de-custo/relatorio'
     | '/configuracoes/notificacoes'
     | '/financeiro/calendario'
     | '/financeiro/cartoes'
@@ -296,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
     | '/_authenticated/notificacoes'
+    | '/_authenticated/centros-de-custo/relatorio'
     | '/_authenticated/configuracoes/notificacoes'
     | '/_authenticated/financeiro/calendario'
     | '/_authenticated/financeiro/cartoes'
@@ -484,15 +497,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesNotificacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/centros-de-custo/relatorio': {
+      id: '/_authenticated/centros-de-custo/relatorio'
+      path: '/relatorio'
+      fullPath: '/centros-de-custo/relatorio'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoRelatorioRouteImport
+      parentRoute: typeof AuthenticatedCentrosDeCustoRouteRoute
+    }
   }
 }
 
 interface AuthenticatedCentrosDeCustoRouteRouteChildren {
+  AuthenticatedCentrosDeCustoRelatorioRoute: typeof AuthenticatedCentrosDeCustoRelatorioRoute
   AuthenticatedCentrosDeCustoIndexRoute: typeof AuthenticatedCentrosDeCustoIndexRoute
 }
 
 const AuthenticatedCentrosDeCustoRouteRouteChildren: AuthenticatedCentrosDeCustoRouteRouteChildren =
   {
+    AuthenticatedCentrosDeCustoRelatorioRoute:
+      AuthenticatedCentrosDeCustoRelatorioRoute,
     AuthenticatedCentrosDeCustoIndexRoute:
       AuthenticatedCentrosDeCustoIndexRoute,
   }
