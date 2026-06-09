@@ -56,6 +56,10 @@ export type Transaction = {
   recurrence_group_id: string | null;
   approval_status: string | null;
   is_reconciled: boolean | null;
+  original_description?: string | null;
+  edited_description?: string | null;
+  category_auto_applied?: boolean | null;
+  bank_statement_import_id?: string | null;
   created_at?: string;
 };
 
@@ -96,6 +100,9 @@ export type Category = {
   type: string | null;
   color: string | null;
   icon: string | null;
+  parent_id: string | null;
+  monthly_budget: number | null;
+  is_active: boolean | null;
 };
 
 export type BankAccount = {
@@ -196,7 +203,48 @@ export async function createCompanyAndLink(input: {
   );
   if (e2) throw e2;
 
+  // 3) semeia categorias padrão
+  await seedDefaultCategories(comp.id);
+
   return comp as Company;
+}
+
+// ---------- Categorias padrão (semeadas no onboarding) ----------
+export const DEFAULT_CATEGORIES: Array<{ name: string; type: "income" | "expense"; color: string; icon: string }> = [
+  // DESPESAS
+  { name: "Fornecedores", type: "expense", color: "#ef4444", icon: "📦" },
+  { name: "Folha de Pagamento", type: "expense", color: "#f97316", icon: "💼" },
+  { name: "Aluguel", type: "expense", color: "#eab308", icon: "🏢" },
+  { name: "Energia Elétrica", type: "expense", color: "#facc15", icon: "💡" },
+  { name: "Internet", type: "expense", color: "#06b6d4", icon: "🌐" },
+  { name: "Marketing", type: "expense", color: "#a855f7", icon: "📣" },
+  { name: "Impostos", type: "expense", color: "#dc2626", icon: "🧾" },
+  { name: "Manutenção", type: "expense", color: "#64748b", icon: "🔧" },
+  { name: "Alimentação", type: "expense", color: "#84cc16", icon: "🍽️" },
+  { name: "Transporte", type: "expense", color: "#0ea5e9", icon: "🚗" },
+  // RECEITAS
+  { name: "Vendas de Produtos", type: "income", color: "#10b981", icon: "🛒" },
+  { name: "Prestação de Serviços", type: "income", color: "#22c55e", icon: "🛠️" },
+  { name: "Juros e Rendimentos", type: "income", color: "#14b8a6", icon: "📈" },
+  { name: "Outras Receitas", type: "income", color: "#16a34a", icon: "💰" },
+];
+
+export async function seedDefaultCategories(companyId: string): Promise<void> {
+  const { data: existing } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("company_id", companyId)
+    .limit(1);
+  if (existing && existing.length > 0) return;
+  const rows = DEFAULT_CATEGORIES.map((c) => ({
+    company_id: companyId,
+    name: c.name,
+    type: c.type,
+    color: c.color,
+    icon: c.icon,
+    is_active: true,
+  }));
+  await supabase.from("categories").insert(rows);
 }
 
 // ---------- Query options (TanStack Query) ----------
@@ -356,3 +404,63 @@ export const statusLabel = (s: string | null | undefined): string => {
       return s ?? "—";
   }
 };
+
+// ---------- Tipos extras Fase 2 ----------
+export type CategoryRule = {
+  id: string;
+  company_id: string | null;
+  pattern: string;
+  category_id: string | null;
+  times_applied: number | null;
+  last_applied: string | null;
+  created_at?: string;
+};
+
+export type NameRule = {
+  id: string;
+  company_id: string | null;
+  original_pattern: string;
+  suggested_name: string;
+  times_applied: number | null;
+  created_at?: string;
+};
+
+export type BankStatementImport = {
+  id: string;
+  company_id: string | null;
+  bank_account_id: string | null;
+  filename: string | null;
+  import_type: string | null;
+  total_transactions: number | null;
+  matched_transactions: number | null;
+  status: string | null;
+  imported_at: string | null;
+};
+
+export const fetchCategoryRules = listByCompany<CategoryRule>("category_rules");
+export const fetchNameRules = listByCompany<NameRule>("name_rules");
+
+export const categoryRulesQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["category_rules", companyId],
+    queryFn: () => (companyId ? fetchCategoryRules(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export const nameRulesQuery = (companyId: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["name_rules", companyId],
+    queryFn: () => (companyId ? fetchNameRules(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
+
+export function applyNameRules(description: string, rules: NameRule[]): { name: string; matched: NameRule | null } {
+  const lower = description.toLowerCase();
+  for (const r of rules) {
+    if (lower.includes(r.original_pattern.toLowerCase())) {
+      return { name: r.suggested_name, matched: r };
+    }
+  }
+  return { name: description, matched: null };
+}
+
