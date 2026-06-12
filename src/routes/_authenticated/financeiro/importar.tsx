@@ -8,15 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileText, CheckCircle2, Loader2, Link2, Plus, X } from "lucide-react";
+import { Upload, FileText, CheckCircle2, Loader2, Link2, Plus, X, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import {
-  transactionsQuery, nameRulesQuery, bankAccountsQuery,
+  transactionsQuery, nameRulesQuery, bankAccountsQuery, categoriesQuery,
   insertRow, applyNameRules, formatBRL, formatDateBR,
   type Transaction, type NameRule,
 } from "@/lib/db";
+import { approvalLimitsQuery, computeApprovalStatus, notifyAdminsPendingApproval } from "@/lib/approvals";
+import { Input } from "@/components/ui/input";
 import { parseOfx, type OfxRow } from "@/lib/ofx";
 import { extractPdfText } from "@/lib/pdf";
 import { parsePdfStatement } from "@/lib/ai.functions";
@@ -28,13 +30,15 @@ export const Route = createFileRoute("/_authenticated/financeiro/importar")({
   component: ImportarPage,
 });
 
-type Row = OfxRow & { selected: boolean; appliedRule?: NameRule | null };
+type Row = OfxRow & { selected: boolean; appliedRule?: NameRule | null; originalDescription: string };
 type MatchAction = "link" | "create" | "ignore";
 type Match = {
   row: Row;
   candidateId: string | null;
   confidence: number; // 0..1
   action: MatchAction;
+  editedDescription: string;
+  categoryId: string | null;
 };
 
 const STEPS = ["Upload", "Revisar", "Conciliar", "Concluído"];
