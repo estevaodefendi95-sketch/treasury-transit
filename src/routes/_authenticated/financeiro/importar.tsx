@@ -101,6 +101,7 @@ function ImportarPage() {
         return {
           ...p,
           description: applied.matched ? applied.name : p.description,
+          originalDescription: p.description,
           appliedRule: applied.matched,
           selected: true,
         };
@@ -144,6 +145,8 @@ function ImportarPage() {
         candidateId: best?.tx.id ?? null,
         confidence,
         action: best && confidence >= 0.5 ? "link" : "create",
+        editedDescription: row.description,
+        categoryId: null,
       };
     });
     setMatches(result);
