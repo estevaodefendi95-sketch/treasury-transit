@@ -177,11 +177,33 @@ function ImportarPage() {
         imported_at: new Date().toISOString(),
       } as unknown as { id: string });
 
+      let pendingApprovals = 0;
       for (const m of matches) {
         if (m.action === "ignore") { ignored++; continue; }
+        const descr = m.editedDescription.trim() || m.row.description;
+
+        // Save name rule if user renamed (and didn't already apply an existing rule)
+        const renamed =
+          descr.toLowerCase() !== m.row.originalDescription.toLowerCase() &&
+          !m.row.appliedRule;
+        if (renamed) {
+          try {
+            await insertRow<NameRule>("name_rules", {
+              company_id: companyId,
+              original_pattern: m.row.originalDescription,
+              suggested_name: descr,
+              times_applied: 1,
+            } as unknown as NameRule);
+          } catch {
+            /* ignore unique-violation if same rule exists */
+          }
+        }
+
         if (m.action === "link" && m.candidateId) {
           await supabase.from("transactions")
             .update({
+              description: descr,
+              category_id: m.categoryId || null,
               payment_date: m.row.date,
               status: m.row.type === "credito" ? "received" : "paid",
               is_reconciled: true,
@@ -190,27 +212,42 @@ function ImportarPage() {
             .eq("id", m.candidateId);
           linked++;
         } else if (m.action === "create") {
-          await insertRow<Transaction>("transactions", {
+          const amount = Number(m.row.amount);
+          const approvalStatus = computeApprovalStatus(amount, profile?.role, approvalLimits);
+          const inserted = await insertRow<Transaction>("transactions", {
             company_id: companyId,
             type: m.row.type === "credito" ? "income" : "expense",
             status: m.row.type === "credito" ? "received" : "paid",
-            description: m.row.description,
-            amount: m.row.amount,
+            description: descr,
+            amount,
             due_date: m.row.date,
             payment_date: m.row.date,
             bank_account_id: bankAccountId || null,
+            category_id: m.categoryId || null,
             is_reconciled: true,
             bank_statement_import_id: impRec.id,
-            original_description: m.row.description,
+            original_description: m.row.originalDescription,
+            approval_status: approvalStatus,
+            created_by: user?.id ?? null,
           } as unknown as Transaction);
           created++;
+          if (approvalStatus === "aguardando_aprovacao") {
+            pendingApprovals++;
+            await notifyAdminsPendingApproval({
+              companyId,
+              transactionId: inserted.id,
+              description: descr,
+              amount,
+              requesterName: profile?.full_name ?? "Usuário",
+            });
+          }
         }
-        // armazena também no bank_statements (snapshot)
+        // snapshot do extrato
         await insertRow("bank_statements", {
           company_id: companyId,
           bank_account_id: bankAccountId || null,
           date: m.row.date,
-          description: m.row.description,
+          description: descr,
           amount: m.row.amount,
           type: m.row.type,
           is_reconciled: m.action === "link" || m.action === "create",
@@ -231,10 +268,13 @@ function ImportarPage() {
         }
       }
 
-      return { linked, created, ignored };
+      return { linked, created, ignored, pendingApprovals };
     },
     onSuccess: (s) => {
-      setSummary(s);
+      setSummary({ linked: s.linked, created: s.created, ignored: s.ignored });
+      if (s.pendingApprovals > 0) {
+        toast.success(`${s.pendingApprovals} lançamento(s) enviados para aprovação`);
+      }
       qc.invalidateQueries({ queryKey: ["transactions", companyId] });
       qc.invalidateQueries({ queryKey: ["bank_accounts", companyId] });
       qc.invalidateQueries({ queryKey: ["bank_statements", companyId] });
