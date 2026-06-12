@@ -1,31 +1,29 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
-  Wallet,
   Calendar,
-  ArrowLeftRight,
   ArrowDownCircle,
   ArrowUpCircle,
   TrendingUp,
+  FileBarChart,
+  Sparkles,
+  Gauge,
+  Landmark,
+  CreditCard,
+  Upload,
+  Settings,
+  Bell,
+  ClipboardCheck,
+  Target,
+  Tags,
+  Receipt,
+  Wand2,
   GitCompareArrows,
   Users,
   ShoppingCart,
   Package,
   ChevronDown,
-  Tags,
-  Upload,
-  Wand2,
-  Landmark,
-  CreditCard,
   Building2,
-  Bell,
-  ClipboardCheck,
-  BarChart3,
-  Sparkles,
-  Target,
-  Receipt,
-  Settings,
-  Banknote,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
@@ -44,22 +42,31 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-const financeiroItems = [
-  { title: "Calendário", url: "/financeiro/calendario", icon: Calendar },
-  { title: "Transações", url: "/financeiro/transacoes", icon: ArrowLeftRight },
-  { title: "Contas Bancárias", url: "/financeiro/contas-bancarias", icon: Landmark },
-  { title: "Cartões", url: "/financeiro/cartoes", icon: CreditCard },
-  { title: "Contas a Pagar", url: "/financeiro/contas-pagar", icon: ArrowUpCircle },
+const lancamentosItems = [
   { title: "Contas a Receber", url: "/financeiro/contas-receber", icon: ArrowDownCircle },
+  { title: "Contas a Pagar", url: "/financeiro/contas-pagar", icon: ArrowUpCircle },
+];
+
+const analisesItems = [
   { title: "Fluxo de Caixa", url: "/financeiro/fluxo-caixa", icon: TrendingUp },
+  { title: "DRE", url: "/relatorios", icon: FileBarChart },
+  { title: "Previsões", url: "/projecao", icon: Sparkles },
+  { title: "Indicadores", url: "/analises/indicadores", icon: Gauge },
+];
+
+const cadastrosItems = [
   { title: "Categorias", url: "/financeiro/categorias", icon: Tags },
   { title: "Centros de Custo", url: "/centros-de-custo", icon: Building2 },
-  { title: "Importar Extrato", url: "/financeiro/importar", icon: Upload },
-  { title: "Importar NF-e", url: "/financeiro/importar-nfe", icon: Receipt },
-  { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
+  { title: "Orçamento", url: "/orcamento", icon: Target },
   { title: "Conciliação", url: "/financeiro/conciliacao", icon: GitCompareArrows },
+  { title: "Regras de Nomes", url: "/financeiro/regras-nomes", icon: Wand2 },
+  { title: "Importar NF-e", url: "/financeiro/importar-nfe", icon: Receipt },
 ];
 
 const vendasItems = [
@@ -68,7 +75,6 @@ const vendasItems = [
   { title: "Produtos", url: "/vendas/produtos", icon: Package },
 ];
 
-
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
@@ -76,14 +82,15 @@ export function AppSidebar() {
   const { profile } = useCurrentCompany();
   const isAdmin = profile?.role === "admin";
   const isActive = (url: string) => pathname === url;
-  const isInGroup = (items: { url: string }[]) => items.some((i) => pathname.startsWith(i.url));
+  const isInGroup = (items: { url: string }[]) =>
+    items.some((i) => pathname.startsWith(i.url));
 
-  const [openFin, setOpenFin] = useState(isInGroup(financeiroItems));
+  const [openCadastros, setOpenCadastros] = useState(isInGroup(cadastrosItems));
   const [openVendas, setOpenVendas] = useState(isInGroup(vendasItems));
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent>
+      <SidebarContent translate="no">
         <div className="px-3 py-4 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
@@ -91,7 +98,9 @@ export function AppSidebar() {
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="text-sm font-semibold leading-tight text-sidebar-foreground">SuaEmpresa</span>
+                <span className="text-sm font-semibold leading-tight text-sidebar-foreground">
+                  SuaEmpresa
+                </span>
                 <span className="text-[10px] text-muted-foreground">Gestão ERP</span>
               </div>
             )}
@@ -102,90 +111,68 @@ export function AppSidebar() {
           <SidebarGroupLabel>Geral</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard")}>
-                  <Link to="/dashboard">
-                    <LayoutDashboard className="h-4 w-4" />
-                    {!collapsed && <span>Dashboard</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/notificacoes")}>
-                  <Link to="/notificacoes">
-                    <Bell className="h-4 w-4" />
-                    {!collapsed && <span>Notificações</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/relatorios")}>
-                  <Link to="/relatorios">
-                    <BarChart3 className="h-4 w-4" />
-                    {!collapsed && <span>Relatórios</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/projecao")}>
-                  <Link to="/projecao">
-                    <Sparkles className="h-4 w-4" />
-                    {!collapsed && <span>Projeção IA</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/orcamento")}>
-                  <Link to="/orcamento">
-                    <Target className="h-4 w-4" />
-                    {!collapsed && <span>Orçamento</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/cobrancas")}>
-                  <Link to="/cobrancas">
-                    <Receipt className="h-4 w-4" />
-                    {!collapsed && <span>Cobranças</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {isAdmin && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={pathname.startsWith("/aprovacoes")}>
-                    <Link to="/aprovacoes">
-                      <ClipboardCheck className="h-4 w-4" />
-                      {!collapsed && <span>Aprovações</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith("/configuracoes")}>
-                  <Link to="/configuracoes">
-                    <Settings className="h-4 w-4" />
-                    {!collapsed && <span>Configurações</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <Item url="/dashboard" icon={LayoutDashboard} title="Dashboard" pathname={pathname} collapsed={collapsed} />
+              <Item url="/financeiro/calendario" icon={Calendar} title="Calendário de Caixa" pathname={pathname} collapsed={collapsed} />
             </SidebarMenu>
-
           </SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Módulos</SidebarGroupLabel>
+          <SidebarGroupLabel>Lançamentos</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <Collapsible open={openFin || collapsed} onOpenChange={setOpenFin} className="group/collapsible">
+              {lancamentosItems.map((i) => (
+                <Item key={i.url} {...i} pathname={pathname} collapsed={collapsed} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-primary font-semibold">
+            Análises
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {analisesItems.map((i) => (
+                <Item key={i.url} {...i} pathname={pathname} collapsed={collapsed} highlight />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Contas</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Item url="/financeiro/contas-bancarias" icon={Landmark} title="Contas Bancárias" pathname={pathname} collapsed={collapsed} />
+              <Item url="/financeiro/cartoes" icon={CreditCard} title="Cartões" pathname={pathname} collapsed={collapsed} />
+              <Item url="/financeiro/importar" icon={Upload} title="Importar Extrato" pathname={pathname} collapsed={collapsed} />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Cadastros</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Collapsible
+                open={openCadastros || collapsed}
+                onOpenChange={setOpenCadastros}
+              >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton isActive={isInGroup(financeiroItems)}>
-                      <Wallet className="h-4 w-4" />
+                    <SidebarMenuButton isActive={isInGroup(cadastrosItems)}>
+                      <Tags className="h-4 w-4" />
                       {!collapsed && (
                         <>
-                          <span>Financeiro</span>
-                          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", openFin && "rotate-180")} />
+                          <span>Cadastros e Regras</span>
+                          <ChevronDown
+                            className={cn(
+                              "ml-auto h-4 w-4 transition-transform",
+                              openCadastros && "rotate-180",
+                            )}
+                          />
                         </>
                       )}
                     </SidebarMenuButton>
@@ -193,7 +180,7 @@ export function AppSidebar() {
                   {!collapsed && (
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {financeiroItems.map((item) => (
+                        {cadastrosItems.map((item) => (
                           <SidebarMenuSubItem key={item.url}>
                             <SidebarMenuSubButton asChild isActive={isActive(item.url)}>
                               <Link to={item.url}>
@@ -209,7 +196,10 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </Collapsible>
 
-              <Collapsible open={openVendas || collapsed} onOpenChange={setOpenVendas} className="group/collapsible">
+              <Collapsible
+                open={openVendas || collapsed}
+                onOpenChange={setOpenVendas}
+              >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton isActive={isInGroup(vendasItems)}>
@@ -217,7 +207,12 @@ export function AppSidebar() {
                       {!collapsed && (
                         <>
                           <span>Vendas</span>
-                          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", openVendas && "rotate-180")} />
+                          <ChevronDown
+                            className={cn(
+                              "ml-auto h-4 w-4 transition-transform",
+                              openVendas && "rotate-180",
+                            )}
+                          />
                         </>
                       )}
                     </SidebarMenuButton>
@@ -243,7 +238,48 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Sistema</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Item url="/notificacoes" icon={Bell} title="Notificações" pathname={pathname} collapsed={collapsed} />
+              {isAdmin && (
+                <Item url="/aprovacoes" icon={ClipboardCheck} title="Aprovações" pathname={pathname} collapsed={collapsed} />
+              )}
+              <Item url="/configuracoes" icon={Settings} title="Configurações" pathname={pathname} collapsed={collapsed} />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
+  );
+}
+
+function Item({
+  url,
+  icon: Icon,
+  title,
+  pathname,
+  collapsed,
+  highlight = false,
+}: {
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  pathname: string;
+  collapsed: boolean;
+  highlight?: boolean;
+}) {
+  const active = pathname === url || pathname.startsWith(url + "/");
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active}>
+        <Link to={url} className={highlight ? "font-medium" : undefined}>
+          <Icon className="h-4 w-4" />
+          {!collapsed && <span>{title}</span>}
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
