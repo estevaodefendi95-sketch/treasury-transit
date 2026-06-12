@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/financeiro/categorias")({
 });
 
 const COLORS = ["#ef4444","#f97316","#eab308","#84cc16","#10b981","#14b8a6","#06b6d4","#3b82f6","#8b5cf6","#a855f7","#ec4899","#64748b"];
-const ICONS = ["Geral","Vendas","Folha","Aluguel","Insumos","Marketing","Impostos","Serviços","Transporte","Banco","Cartão","Outros"];
+const ICONS = ["•","○","◆","▲","■","★"];
 
 function CategoriasPage() {
   const { companyId } = useCurrentCompany();
