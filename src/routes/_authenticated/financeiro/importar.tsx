@@ -44,11 +44,13 @@ type Match = {
 const STEPS = ["Upload", "Revisar", "Conciliar", "Concluído"];
 
 function ImportarPage() {
-  const { companyId } = useCurrentCompany();
+  const { companyId, profile, user } = useCurrentCompany();
   const qc = useQueryClient();
   const { data: transacoes = [] } = useQuery(transactionsQuery(companyId));
   const { data: nameRules = [] } = useQuery(nameRulesQuery(companyId));
   const { data: bankAccounts = [] } = useQuery(bankAccountsQuery(companyId));
+  const { data: categorias = [] } = useQuery(categoriesQuery(companyId));
+  const { data: approvalLimits = [] } = useQuery(approvalLimitsQuery(companyId));
   const parsePdf = useServerFn(parsePdfStatement);
 
   const [step, setStep] = useState(1);
