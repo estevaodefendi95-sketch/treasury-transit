@@ -435,63 +435,113 @@ function ImportarPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Edite o nome da movimentação (salva regra para próximas importações) e selecione a categoria. Depois envie para aprovação.
+            </p>
             {matches.map((m, i) => {
               const candidate = transacoes.find((t) => t.id === m.candidateId);
               const tier = m.confidence >= 0.8 ? "Alta" : m.confidence >= 0.5 ? "Média" : "Baixa";
               const tierColor = m.confidence >= 0.8 ? "bg-emerald-100 text-emerald-700"
                 : m.confidence >= 0.5 ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600";
+              const isIncome = m.row.type === "credito";
+              const cats = categorias.filter((c) => (c.type ?? "expense") === (isIncome ? "income" : "expense"));
+              const renamed =
+                m.editedDescription.trim().toLowerCase() !==
+                m.row.originalDescription.toLowerCase();
               return (
-                <div key={i} className="grid grid-cols-12 gap-3 items-center border border-border rounded-lg p-3">
-                  <div className="col-span-5">
-                    <div className="text-xs text-muted-foreground">Extrato</div>
-                    <div className="font-medium text-sm">{m.row.description}</div>
-                    <div className="text-xs">
-                      {formatDateBR(m.row.date)} · <span className={m.row.type === "credito" ? "text-emerald-600" : "text-rose-600"}>
-                        {m.row.type === "credito" ? "+" : "-"}{formatBRL(m.row.amount)}
-                      </span>
+                <div key={i} className="border border-border rounded-lg p-3 space-y-3">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="min-w-0">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Extrato original</div>
+                      <div className="text-xs text-muted-foreground truncate">{m.row.originalDescription}</div>
+                      <div className="text-xs mt-0.5">
+                        {formatDateBR(m.row.date)} ·{" "}
+                        <span className={isIncome ? "text-emerald-600" : "text-rose-600"}>
+                          {isIncome ? "+" : "-"}{formatBRL(m.row.amount)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className={cn("text-[10px]", tierColor)}>{tier} {Math.round(m.confidence * 100)}%</Badge>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant={m.action === "link" ? "default" : "outline"} className="h-7 px-2"
+                          disabled={!m.candidateId} title="Vincular a lançamento existente"
+                          onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "link" } : x))}>
+                          <Link2 className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant={m.action === "create" ? "default" : "outline"} className="h-7 px-2"
+                          title="Criar novo lançamento"
+                          onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "create" } : x))}>
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant={m.action === "ignore" ? "default" : "outline"} className="h-7 px-2"
+                          title="Ignorar"
+                          onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "ignore" } : x))}>
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="col-span-2 flex flex-col items-center gap-1">
-                    <Badge className={cn("text-[10px]", tierColor)}>{tier} {Math.round(m.confidence * 100)}%</Badge>
-                    <div className="flex gap-1">
-                      <Button size="sm" variant={m.action === "link" ? "default" : "outline"} className="h-7 px-2"
-                        disabled={!m.candidateId}
-                        onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "link" } : x))}>
-                        <Link2 className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant={m.action === "create" ? "default" : "outline"} className="h-7 px-2"
-                        onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "create" } : x))}>
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant={m.action === "ignore" ? "default" : "outline"} className="h-7 px-2"
-                        onClick={() => setMatches((arr) => arr.map((x, j) => j === i ? { ...x, action: "ignore" } : x))}>
-                        <X className="h-3 w-3" />
-                      </Button>
+
+                  {m.action !== "ignore" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1">
+                          <Pencil className="h-3 w-3" /> Descrição
+                          {renamed && (
+                            <span className="text-[10px] text-amber-600">(regra será salva)</span>
+                          )}
+                        </label>
+                        <Input
+                          value={m.editedDescription}
+                          onChange={(e) =>
+                            setMatches((arr) => arr.map((x, j) =>
+                              j === i ? { ...x, editedDescription: e.target.value } : x))
+                          }
+                          placeholder="Nome da movimentação"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                          Categoria
+                        </label>
+                        <select
+                          className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                          value={m.categoryId ?? ""}
+                          onChange={(e) =>
+                            setMatches((arr) => arr.map((x, j) =>
+                              j === i ? { ...x, categoryId: e.target.value || null } : x))
+                          }
+                        >
+                          <option value="">— Sem categoria —</option>
+                          {cats.map((c) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                  </div>
-                  <div className="col-span-5">
-                    <div className="text-xs text-muted-foreground">Sistema</div>
-                    {candidate ? (
-                      <>
-                        <div className="font-medium text-sm">{candidate.description}</div>
-                        <div className="text-xs">{formatDateBR(candidate.due_date)} · {formatBRL(Number(candidate.amount))}</div>
-                      </>
-                    ) : (
-                      <div className="text-sm text-muted-foreground italic">Sem candidato — será criada</div>
-                    )}
-                  </div>
+                  )}
+
+                  {m.action === "link" && candidate && (
+                    <div className="text-xs text-muted-foreground border-t pt-2">
+                      Vinculando a: <span className="font-medium text-foreground">{candidate.description}</span>
+                      {" · "}{formatDateBR(candidate.due_date)} · {formatBRL(Number(candidate.amount))}
+                    </div>
+                  )}
                 </div>
               );
             })}
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
               <Button onClick={() => finalize.mutate()} disabled={finalize.isPending}>
-                {finalize.isPending ? "Salvando..." : "Concluir"}
+                {finalize.isPending ? "Salvando..." : "Enviar para aprovação"}
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+
 
       {/* Step 4 */}
       {step === 4 && (
