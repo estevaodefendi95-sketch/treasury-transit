@@ -19,8 +19,8 @@ export type ProjectionSummary = {
   points: ProjectionPoint[];
 };
 
-const PAID = new Set(["paid", "received"]);
-const DEAD = new Set(["paid", "received", "canceled"]);
+const PAID = new Set(["pago", "recebido"]);
+const DEAD = new Set(["pago", "recebido", "cancelado"]);
 
 function dayLabel(iso: string) {
   return iso.slice(8, 10) + "/" + iso.slice(5, 7);
@@ -43,14 +43,14 @@ export function computeProjection(
   // Current balance: net of already settled
   const currentBalance = transactions.reduce((s, t) => {
     if (!PAID.has(String(t.status))) return s;
-    return s + (t.type === "income" ? Number(t.amount) : -Number(t.amount));
+    return s + (t.type === "receita" ? Number(t.amount) : -Number(t.amount));
   }, 0);
 
   // Overdue receivables (income, not settled, past due)
   const overdueReceivables = transactions
     .filter(
       (t) =>
-        t.type === "income" &&
+        t.type === "receita" &&
         !DEAD.has(String(t.status)) &&
         t.due_date < today,
     )
@@ -64,10 +64,10 @@ export function computeProjection(
       t.due_date <= horizon,
   );
   const scheduledReceivables = upcoming
-    .filter((t) => t.type === "income")
+    .filter((t) => t.type === "receita")
     .reduce((s, t) => s + Number(t.amount), 0);
   const scheduledPayables = upcoming
-    .filter((t) => t.type === "expense")
+    .filter((t) => t.type === "despesa")
     .reduce((s, t) => s + Number(t.amount), 0);
 
   // Daily buckets
@@ -87,7 +87,7 @@ export function computeProjection(
   const byDayProj: Record<string, number> = {};
   // Track advance debt to subtract later: we don't know which exact future receivables,
   // so subtract proportionally from upcoming income across horizon
-  const futureIncome = upcoming.filter((t) => t.type === "income");
+  const futureIncome = upcoming.filter((t) => t.type === "receita");
   const totalFutureIncome = futureIncome.reduce((s, t) => s + Number(t.amount), 0);
   const advanceFactor =
     advance > 0 && totalFutureIncome > 0
@@ -97,12 +97,12 @@ export function computeProjection(
   for (const t of upcoming) {
     const day = t.due_date;
     const amt = Number(t.amount);
-    const signed = t.type === "income" ? amt : -amt;
+    const signed = t.type === "receita" ? amt : -amt;
     const isApproved =
       !t.approval_status || t.approval_status === "aprovado";
     // adjusted amount if we anticipated proportionally
     const adjSigned =
-      t.type === "income" && advanceFactor > 0
+      t.type === "receita" && advanceFactor > 0
         ? signed * (1 - advanceFactor)
         : signed;
     if (isApproved) {
@@ -150,7 +150,7 @@ export function computeBreakeven(transactions: Transaction[]): number {
   const recentExpense = transactions
     .filter(
       (t) =>
-        t.type === "expense" &&
+        t.type === "despesa" &&
         (t.payment_date ?? t.due_date) >= cutoff &&
         (t.payment_date ?? t.due_date) <= todayISO(),
     )

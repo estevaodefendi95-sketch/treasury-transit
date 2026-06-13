@@ -52,7 +52,7 @@ export function TransferModal({ open, onOpenChange, accounts, companyId }: Props
         {
           company_id: companyId,
           type: "transferencia_out",
-          status: "paid",
+          status: "pago",
           description: `${form.description} → ${toName}`,
           amount,
           due_date: form.date,
@@ -63,7 +63,7 @@ export function TransferModal({ open, onOpenChange, accounts, companyId }: Props
         {
           company_id: companyId,
           type: "transferencia_in",
-          status: "received",
+          status: "recebido",
           description: `${form.description} ← ${fromName}`,
           amount,
           due_date: form.date,

@@ -36,8 +36,8 @@ export type Profile = {
 };
 
 
-export type TxType = "income" | "expense";
-export type TxStatus = "pending" | "paid" | "received" | "overdue" | "canceled" | "scheduled";
+export type TxType = "receita" | "despesa";
+export type TxStatus = "pendente" | "pago" | "recebido" | "vencido" | "cancelado" | "pendente";
 
 export type Transaction = {
   id: string;
@@ -254,23 +254,23 @@ export async function createCompanyAndLink(input: {
 }
 
 // ---------- Categorias padrão (semeadas no onboarding) ----------
-export const DEFAULT_CATEGORIES: Array<{ name: string; type: "income" | "expense"; color: string; icon: string }> = [
+export const DEFAULT_CATEGORIES: Array<{ name: string; type: "receita" | "despesa"; color: string; icon: string }> = [
   // DESPESAS
-  { name: "Fornecedores", type: "expense", color: "#ef4444", icon: "📦" },
-  { name: "Folha de Pagamento", type: "expense", color: "#f97316", icon: "💼" },
-  { name: "Aluguel", type: "expense", color: "#eab308", icon: "🏢" },
-  { name: "Energia Elétrica", type: "expense", color: "#facc15", icon: "💡" },
-  { name: "Internet", type: "expense", color: "#06b6d4", icon: "🌐" },
-  { name: "Marketing", type: "expense", color: "#a855f7", icon: "📣" },
-  { name: "Impostos", type: "expense", color: "#dc2626", icon: "🧾" },
-  { name: "Manutenção", type: "expense", color: "#64748b", icon: "🔧" },
-  { name: "Alimentação", type: "expense", color: "#84cc16", icon: "🍽️" },
-  { name: "Transporte", type: "expense", color: "#0ea5e9", icon: "🚗" },
+  { name: "Fornecedores", type: "despesa", color: "#ef4444", icon: "📦" },
+  { name: "Folha de Pagamento", type: "despesa", color: "#f97316", icon: "💼" },
+  { name: "Aluguel", type: "despesa", color: "#eab308", icon: "🏢" },
+  { name: "Energia Elétrica", type: "despesa", color: "#facc15", icon: "💡" },
+  { name: "Internet", type: "despesa", color: "#06b6d4", icon: "🌐" },
+  { name: "Marketing", type: "despesa", color: "#a855f7", icon: "📣" },
+  { name: "Impostos", type: "despesa", color: "#dc2626", icon: "🧾" },
+  { name: "Manutenção", type: "despesa", color: "#64748b", icon: "🔧" },
+  { name: "Alimentação", type: "despesa", color: "#84cc16", icon: "🍽️" },
+  { name: "Transporte", type: "despesa", color: "#0ea5e9", icon: "🚗" },
   // RECEITAS
-  { name: "Vendas de Produtos", type: "income", color: "#10b981", icon: "🛒" },
-  { name: "Prestação de Serviços", type: "income", color: "#22c55e", icon: "🛠️" },
-  { name: "Juros e Rendimentos", type: "income", color: "#14b8a6", icon: "📈" },
-  { name: "Outras Receitas", type: "income", color: "#16a34a", icon: "💰" },
+  { name: "Vendas de Produtos", type: "receita", color: "#10b981", icon: "🛒" },
+  { name: "Prestação de Serviços", type: "receita", color: "#22c55e", icon: "🛠️" },
+  { name: "Juros e Rendimentos", type: "receita", color: "#14b8a6", icon: "📈" },
+  { name: "Outras Receitas", type: "receita", color: "#16a34a", icon: "💰" },
 ];
 
 export async function seedDefaultCategories(companyId: string): Promise<void> {
@@ -435,23 +435,23 @@ export const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const isOverdue = (tx: Transaction): boolean => {
   if (tx.payment_date) return false;
-  if (tx.status === "paid" || tx.status === "received" || tx.status === "canceled") return false;
+  if (tx.status === "pago" || tx.status === "recebido" || tx.status === "cancelado") return false;
   return tx.due_date < todayISO();
 };
 
 export const statusLabel = (s: string | null | undefined): string => {
   switch (s) {
-    case "paid":
+    case "pago":
       return "Pago";
-    case "received":
+    case "recebido":
       return "Recebido";
-    case "pending":
+    case "pendente":
       return "Pendente";
-    case "scheduled":
+    case "pendente":
       return "Agendado";
-    case "overdue":
+    case "vencido":
       return "Atrasado";
-    case "canceled":
+    case "cancelado":
       return "Cancelado";
     default:
       return s ?? "—";

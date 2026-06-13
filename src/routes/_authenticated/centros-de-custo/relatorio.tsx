@@ -46,8 +46,8 @@ function RelatorioPage() {
   }, [transactions, from, to, centerId]);
 
   const totals = useMemo(() => {
-    const receita = filtered.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-    const despesa = filtered.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+    const receita = filtered.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+    const despesa = filtered.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
     return { receita, despesa, resultado: receita - despesa };
   }, [filtered]);
 
@@ -56,7 +56,7 @@ function RelatorioPage() {
     for (const t of filtered) {
       const k = t.cost_center_id ?? "—";
       if (!m[k]) m[k] = { receita: 0, despesa: 0 };
-      if (t.type === "income") m[k].receita += Number(t.amount);
+      if (t.type === "receita") m[k].receita += Number(t.amount);
       else m[k].despesa += Number(t.amount);
     }
     return Object.entries(m).map(([id, v]) => {
@@ -70,7 +70,7 @@ function RelatorioPage() {
     for (const t of filtered) {
       const k = t.category_id ?? "—";
       if (!m[k]) m[k] = { receita: 0, despesa: 0 };
-      if (t.type === "income") m[k].receita += Number(t.amount);
+      if (t.type === "receita") m[k].receita += Number(t.amount);
       else m[k].despesa += Number(t.amount);
     }
     return Object.entries(m).map(([id, v]) => {

@@ -21,8 +21,8 @@ function FluxoCaixaPage() {
     if (!ref) return acc;
     const dia = ref.slice(8, 10) + "/" + ref.slice(5, 7);
     if (!acc[dia]) acc[dia] = { dia, entradas: 0, saidas: 0 };
-    if (t.type === "income") acc[dia].entradas += Number(t.amount);
-    else if (t.type === "expense") acc[dia].saidas += Number(t.amount);
+    if (t.type === "receita") acc[dia].entradas += Number(t.amount);
+    else if (t.type === "despesa") acc[dia].saidas += Number(t.amount);
     return acc;
   }, {});
 

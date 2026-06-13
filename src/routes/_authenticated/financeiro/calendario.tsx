@@ -64,7 +64,7 @@ function CalendarioPage() {
       if (!d?.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`)) return;
       const amount = Number(t.amount);
       const realized = !!t.payment_date;
-      if (t.type === "income") {
+      if (t.type === "receita") {
         if (realized) entradas += amount; else projEntradas += amount;
       } else {
         if (realized) saidas += amount; else projSaidas += amount;
@@ -126,8 +126,8 @@ function CalendarioPage() {
             ))}
             {cells.map((day, i) => {
               const items = day ? byDay[String(day)] || [] : [];
-              const totalIn = items.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-              const totalOut = items.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+              const totalIn = items.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+              const totalOut = items.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
               const balance = totalIn - totalOut;
               const hasRecurring = items.some((t) => t.recurrence && t.recurrence !== "unico");
               const isToday = day !== null && isCurrentMonth && day === today.getDate();
@@ -176,8 +176,8 @@ function CalendarioPage() {
           <div className="md:hidden space-y-2">
             {Object.keys(byDay).sort((a, b) => Number(a) - Number(b)).map((day) => {
               const items = byDay[day];
-              const totalIn = items.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-              const totalOut = items.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+              const totalIn = items.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+              const totalOut = items.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
               return (
                 <button key={day} onClick={() => setSelectedDay(day)}
                   className="w-full text-left rounded-md border border-border p-3 hover:bg-accent">
@@ -213,8 +213,8 @@ function CalendarioPage() {
               <div key={t.id} className="rounded-md border border-border p-3 space-y-1">
                 <div className="flex justify-between items-start gap-2">
                   <div className="font-medium text-sm">{t.description}</div>
-                  <div className={cn("font-mono text-sm shrink-0", t.type === "income" ? "text-emerald-600" : "text-rose-600")}>
-                    {t.type === "income" ? "+" : "-"} {formatBRL(Number(t.amount))}
+                  <div className={cn("font-mono text-sm shrink-0", t.type === "receita" ? "text-emerald-600" : "text-rose-600")}>
+                    {t.type === "receita" ? "+" : "-"} {formatBRL(Number(t.amount))}
                   </div>
                 </div>
                 <div className="flex gap-2 text-xs text-muted-foreground">

@@ -31,8 +31,8 @@ function ContasPagarPage() {
   const qc = useQueryClient();
   const { data: all = [] } = useQuery(transactionsQuery(companyId));
   const { data: suppliers = [] } = useQuery(suppliersQuery(companyId));
-  const contas = all.filter((t) => t.type === "expense");
-  const total = contas.filter((c) => c.status !== "paid" && c.status !== "canceled").reduce((s, c) => s + Number(c.amount), 0);
+  const contas = all.filter((t) => t.type === "despesa");
+  const total = contas.filter((c) => c.status !== "pago" && c.status !== "cancelado").reduce((s, c) => s + Number(c.amount), 0);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ description: "", amount: "", due_date: todayISO(), supplier_id: "" });
@@ -42,8 +42,8 @@ function ContasPagarPage() {
       if (!companyId) throw new Error("Sem empresa");
       return insertRow<Transaction>("transactions", {
         company_id: companyId,
-        type: "expense",
-        status: "pending",
+        type: "despesa",
+        status: "pendente",
         description: form.description,
         amount: Number(form.amount.replace(",", ".")),
         due_date: form.due_date,
@@ -61,7 +61,7 @@ function ContasPagarPage() {
 
   const markPaid = useMutation({
     mutationFn: async (id: string) =>
-      updateRow<Transaction>("transactions", id, { status: "paid", payment_date: todayISO() }),
+      updateRow<Transaction>("transactions", id, { status: "pago", payment_date: todayISO() }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transactions", companyId] });
       toast.success("Marcada como paga");
@@ -144,12 +144,12 @@ function ContasPagarPage() {
                     <TableCell>{formatDateBR(c.due_date)}</TableCell>
                     <TableCell className="text-right font-mono">{formatBRL(Number(c.amount))}</TableCell>
                     <TableCell>
-                      <Badge variant={c.status === "paid" ? "default" : overdue ? "destructive" : "secondary"}>
+                      <Badge variant={c.status === "pago" ? "default" : overdue ? "destructive" : "secondary"}>
                         {overdue ? "Atrasado" : statusLabel(c.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {c.status !== "paid" && (
+                      {c.status !== "pago" && (
                         <Button size="sm" variant="outline" onClick={() => markPaid.mutate(c.id)}>
                           <Check className="h-3 w-3 mr-1" />Pagar
                         </Button>

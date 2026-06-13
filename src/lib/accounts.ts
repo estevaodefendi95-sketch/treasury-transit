@@ -23,10 +23,10 @@ export function computeAccountBalance(
   let delta = 0;
   for (const t of transactions) {
     if (t.bank_account_id !== account.id) continue;
-    if (t.status !== "paid" && t.status !== "received") continue;
+    if (t.status !== "pago" && t.status !== "recebido") continue;
     const amount = Number(t.amount);
-    if (t.type === "income" || t.type === "transferencia_in") delta += amount;
-    else if (t.type === "expense" || t.type === "transferencia_out") delta -= amount;
+    if (t.type === "receita" || t.type === "transferencia_in") delta += amount;
+    else if (t.type === "despesa" || t.type === "transferencia_out") delta -= amount;
   }
   return initial + delta;
 }
@@ -43,13 +43,13 @@ export function buildBalanceHistory(
 
   // Construir mapa de delta por dia
   const txs = transactions.filter(
-    (t) => t.bank_account_id === account.id && (t.status === "paid" || t.status === "received"),
+    (t) => t.bank_account_id === account.id && (t.status === "pago" || t.status === "recebido"),
   );
   const deltaByDay = new Map<string, number>();
   for (const t of txs) {
     const d = (t.payment_date ?? t.due_date).slice(0, 10);
     const amount = Number(t.amount);
-    const sign = t.type === "income" || t.type === "transferencia_in" ? 1 : -1;
+    const sign = t.type === "receita" || t.type === "transferencia_in" ? 1 : -1;
     deltaByDay.set(d, (deltaByDay.get(d) ?? 0) + sign * amount);
   }
 
@@ -81,7 +81,7 @@ export function computeCardSpending(
     .filter(
       (t) =>
         t.credit_card_id === cardId &&
-        t.type === "expense" &&
+        t.type === "despesa" &&
         t.due_date >= cycle.startISO &&
         t.due_date <= cycle.endISO,
     )

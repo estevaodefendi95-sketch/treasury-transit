@@ -60,7 +60,7 @@ function TransacoesPage() {
   const [onlyMissingAttachment, setOnlyMissingAttachment] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    type: "expense" as "income" | "expense",
+    type: "despesa" as "receita" | "despesa",
     description: "", amount: "", due_date: todayISO(),
     category_id: "" as string | null,
     cost_center_id: "" as string | null,
@@ -129,7 +129,7 @@ function TransacoesPage() {
   };
 
   const resetForm = () => {
-    setForm({ type: "expense", description: "", amount: "", due_date: todayISO(), category_id: "", cost_center_id: "", recurrence: "unico" });
+    setForm({ type: "despesa", description: "", amount: "", due_date: todayISO(), category_id: "", cost_center_id: "", recurrence: "unico" });
     setPayment(emptyPaymentFields);
     setPendingAttachment(null);
     setSuggestion(null);
@@ -145,7 +145,7 @@ function TransacoesPage() {
       const base = {
         company_id: companyId,
         type: form.type,
-        status: "pending",
+        status: "pendente",
         description: form.description,
         amount,
         due_date: form.due_date,
@@ -278,9 +278,9 @@ function TransacoesPage() {
                   <Label>Tipo</Label>
                   <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                     value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value as "income" | "expense", category_id: "" })}>
-                    <option value="expense">Despesa</option>
-                    <option value="income">Receita</option>
+                    onChange={(e) => setForm({ ...form, type: e.target.value as "receita" | "despesa", category_id: "" })}>
+                    <option value="despesa">Despesa</option>
+                    <option value="receita">Receita</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -471,8 +471,8 @@ function TransacoesPage() {
                         </button>
                       </TableCell>
                       <TableCell>{statusLabel(t.status)}</TableCell>
-                      <TableCell className={`text-right font-mono ${t.type === "income" ? "text-emerald-600" : "text-rose-600"}`}>
-                        {t.type === "income" ? "+" : "-"} {formatBRL(Number(t.amount))}
+                      <TableCell className={`text-right font-mono ${t.type === "receita" ? "text-emerald-600" : "text-rose-600"}`}>
+                        {t.type === "receita" ? "+" : "-"} {formatBRL(Number(t.amount))}
                       </TableCell>
                       <TableCell>
                         <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100"

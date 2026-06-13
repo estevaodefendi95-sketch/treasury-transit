@@ -44,7 +44,7 @@ function ImportarNfePage() {
   const [bankAccountId, setBankAccountId] = useState<string>("");
   const [notes, setNotes] = useState("");
 
-  const expenseCats = categories.filter((c) => c.type === "expense");
+  const expenseCats = categories.filter((c) => c.type === "despesa");
 
   const handleFile = async (file: File) => {
     try {
@@ -68,8 +68,8 @@ function ImportarNfePage() {
       await insertRow("transactions", {
         id,
         company_id: companyId,
-        type: "expense",
-        status: "pending",
+        type: "despesa",
+        status: "pendente",
         description,
         amount: Number(amount),
         due_date: dueDate,

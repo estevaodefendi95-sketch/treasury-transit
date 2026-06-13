@@ -36,7 +36,7 @@ function CategoriasPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState({
-    name: "", type: "expense" as "income" | "expense",
+    name: "", type: "despesa" as "receita" | "despesa",
     color: COLORS[0], icon: ICONS[0], parent_id: "", monthly_budget: "",
   });
 
@@ -54,7 +54,7 @@ function CategoriasPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ name: "", type: "expense", color: COLORS[0], icon: ICONS[0], parent_id: "", monthly_budget: "" });
+    setForm({ name: "", type: "despesa", color: COLORS[0], icon: ICONS[0], parent_id: "", monthly_budget: "" });
     setOpen(true);
   };
 
@@ -62,7 +62,7 @@ function CategoriasPage() {
     setEditing(c);
     setForm({
       name: c.name,
-      type: ((c.type as "income" | "expense") ?? "expense"),
+      type: ((c.type as "receita" | "despesa") ?? "despesa"),
       color: c.color ?? COLORS[0],
       icon: c.icon ?? ICONS[0],
       parent_id: "",
@@ -105,8 +105,8 @@ function CategoriasPage() {
   });
 
   const groups = [
-    { type: "expense" as const, title: "Despesas" },
-    { type: "income" as const, title: "Receitas" },
+    { type: "despesa" as const, title: "Despesas" },
+    { type: "receita" as const, title: "Receitas" },
   ];
 
   return (
@@ -131,10 +131,10 @@ function CategoriasPage() {
                   <select
                     className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                     value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value as "income" | "expense" })}
+                    onChange={(e) => setForm({ ...form, type: e.target.value as "receita" | "despesa" })}
                   >
-                    <option value="expense">Despesa</option>
-                    <option value="income">Receita</option>
+                    <option value="despesa">Despesa</option>
+                    <option value="receita">Receita</option>
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -193,7 +193,7 @@ function CategoriasPage() {
       />
 
       {groups.map((g) => {
-        const items = categorias.filter((c) => (c.type ?? "expense") === g.type);
+        const items = categorias.filter((c) => (c.type ?? "despesa") === g.type);
         return (
           <Card key={g.type}>
             <CardHeader><CardTitle className="text-base">{g.title} ({items.length})</CardTitle></CardHeader>
