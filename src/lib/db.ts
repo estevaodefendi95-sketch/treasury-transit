@@ -37,7 +37,7 @@ export type Profile = {
 
 
 export type TxType = "receita" | "despesa";
-export type TxStatus = "pendente" | "pago" | "recebido" | "vencido" | "cancelado" | "pendente";
+export type TxStatus = "pendente" | "pago" | "recebido" | "vencido" | "cancelado";
 
 export type Transaction = {
   id: string;
