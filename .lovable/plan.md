@@ -1,77 +1,65 @@
+## Problema
 
-## Contexto
+Ao salvar, o Postgres rejeita com:
+- `categories_type_check` — o código envia `"income"` / `"expense"`, mas o CHECK do banco aceita outros valores (provavelmente `"receita"` / `"despesa"`, já que o resto do app está em PT-BR).
+- O mesmo provavelmente atinge `bank_statements.type` (`"credito"` / `"debito"`) e `transactions.status` (`"paid"` / `"received"` / `"pending"` / `"canceled"`), quebrando a importação de extrato.
 
-O repositório `Financeiro` no GitHub é uma exportação Taskade contendo:
-- App React (CRA + React Router DOM + Zustand + Supabase) em `apps/default/src/`
-- Módulos: Auth (Login/Register/Onboarding), Dashboard, Financeiro (Calendário, Transações, Contas a Pagar/Receber, Fluxo de Caixa, Conciliação), Vendas (Clientes, Pedidos, Produtos), Estoque, Relatórios, Configurações
-- Componentes UI shadcn já presentes
-- Agente IA "SuaEmpresa — Assistente de Gestão" e automação Taskade
+Como não tenho acesso direto ao banco neste modo, o passo 1 é descobrir o conjunto exato de valores aceitos.
 
-O Lovable usa **TanStack Start** (não CRA + React Router DOM). Não é possível copiar `App.tsx` e os arquivos de rota diretamente — a estrutura de roteamento, providers e chamadas de servidor são diferentes. Será uma **reescrita estrutural** preservando UI, lógica de negócio e schema de dados.
+## Passo 1 — Descobrir os valores aceitos (1 query)
 
-## Escopo desta entrega
+Rodar no SQL editor:
 
-Conforme suas respostas:
-- **Conectar ao Supabase existente** do projeto (você fornecerá URL + anon key)
-- Reconstruir **Dashboard + Financeiro + Vendas** (Estoque/Relatórios/Configurações ficam para depois)
-- Manter autenticação Supabase (login, registro, onboarding)
-
-## O que será construído
-
-### 1. Integração Supabase
-- Criar `src/integrations/supabase/client.ts` (browser) usando `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` que você fornecerá via secrets
-- Criar `src/integrations/supabase/types.ts` (placeholder — você poderá colar os types gerados depois)
-- Hook `useAuth` que escuta `onAuthStateChange` no `__root.tsx`
-
-### 2. Estrutura de rotas (TanStack Start, em `src/routes/`)
-```
-__root.tsx                       (já existe — adicionar QueryClient + auth listener)
-index.tsx                        (landing → redirect /dashboard ou /auth)
-auth.tsx                         (login + registro com tabs)
-onboarding.tsx                   (configurar empresa)
-_authenticated/route.tsx         (gate; redirect /auth se não logado)
-_authenticated/dashboard.tsx
-_authenticated/financeiro/calendario.tsx
-_authenticated/financeiro/transacoes.tsx
-_authenticated/financeiro/contas-pagar.tsx
-_authenticated/financeiro/contas-receber.tsx
-_authenticated/financeiro/fluxo-caixa.tsx
-_authenticated/financeiro/conciliacao.tsx
-_authenticated/vendas/clientes.tsx
-_authenticated/vendas/pedidos.tsx
-_authenticated/vendas/produtos.tsx
+```sql
+select conname, pg_get_constraintdef(oid)
+from pg_constraint
+where conrelid in (
+  'public.categories'::regclass,
+  'public.transactions'::regclass,
+  'public.bank_statements'::regclass
+) and contype = 'c';
 ```
 
-### 3. Layout
-- `src/components/layout/AppLayout.tsx` com Sidebar de navegação (baseado no `Sidebar.tsx` original — menu: Dashboard / Financeiro (expansível) / Vendas (expansível))
-- Topbar com nome do usuário, empresa, toggle dark mode, logout
-- Aplicado via `_authenticated/route.tsx` envolvendo `<Outlet />`
+Cole o resultado no chat. Com isso eu sei exatamente o que cada coluna espera.
 
-### 4. Estado (Zustand)
-- `src/store/useStore.ts` portado do original: `useAuthStore` (sessão/empresa/onboarding) e `useAppStore` (transações, contas, clientes, pedidos, produtos, com `loadFromSupabase`)
+## Passo 2 — Alinhar o código ao banco
 
-### 5. Páginas
-Cada página reescrita com:
-- shadcn components já existentes em `src/components/ui/`
-- Tabelas com filtros, modais de criar/editar, badges de status
-- Formato BR (R$ 1.000,00, datas dd/mm/aaaa)
-- Cálculos: saldo, total a pagar/receber, gráficos no Dashboard (usando `recharts` já disponível)
+Estratégia: **adaptar o código ao schema existente** (sem migration), criando um pequeno mapa de tradução em `src/lib/db.ts`:
 
-### 6. Configuração
-- Adicionar dependências faltantes via `bun add`: `zustand`, `date-fns`, `recharts` (verificar)
-- Atualizar `src/styles.css` com paleta neutra profissional (mantendo tokens semânticos)
-- Substituir o placeholder em `src/routes/index.tsx`
+```
+UI/código          →  Banco
+"income"           →  ? (ex.: "receita")
+"expense"          →  ? (ex.: "despesa")
+"credito"          →  ? (ex.: "entrada"/"credit")
+"debito"           →  ? (ex.: "saida"/"debit")
+"paid"/"received"  →  ? (ex.: "pago"/"recebido")
+"pending"          →  ? (ex.: "pendente")
+"canceled"         →  ? (ex.: "cancelado")
+```
 
-## O que **não** será feito agora
-- Migração do schema Supabase — você usará as tabelas que já existem no projeto Supabase original
-- Módulos Estoque, Relatórios, Configurações (fica para iteração seguinte)
-- Agente IA / automações Taskade (não são parte do app web)
-- Importar dados — a aplicação lerá o Supabase existente direto
+Arquivos a tocar (apenas onde insere/atualiza):
 
-## O que preciso de você antes de implementar
+1. `src/lib/db.ts` — exportar helpers `toDbCategoryType`, `toDbTxStatus`, `toDbStmtType` (+ inverso para leitura, se necessário).
+2. `src/routes/_authenticated/financeiro/categorias.tsx` — converter `form.type` antes do insert/update.
+3. `src/routes/_authenticated/financeiro/importar.tsx` — converter `status`, `type` e o `type` do `bank_statements` antes de cada `insert`/`update`.
+4. `src/routes/_authenticated/financeiro/transacoes.tsx`, `contas-pagar.tsx`, `contas-receber.tsx` — auditoria rápida dos inserts/updates de status.
+5. `src/lib/db.ts` — `DEFAULT_CATEGORIES` (seed) também precisa usar os valores válidos.
+6. Filtros e comparações no front (`t.status === "paid"` etc.) continuam funcionando porque a leitura usa os mesmos valores do banco; ajustamos as comparações junto com o mapa.
 
-1. **URL do projeto Supabase** (ex: `https://xxxxx.supabase.co`)
-2. **Publishable / anon key** do Supabase
-3. **Confirmação do schema**: as tabelas (`transacoes`, `contas_pagar`, `contas_receber`, `clientes`, `pedidos`, `produtos`, `empresas`, `profiles`, etc.) já existem no seu Supabase? Se sim, idealmente cole o output de `supabase gen types typescript` ou descreva os nomes/colunas — sem isso, criarei tipos genéricos baseados no que o código original usa.
+Se preferir manter o app falando inglês, alternativa em vez do passo acima é uma **migration** que altera os CHECKs/enums para aceitar `income`/`expense`/`paid`/`received`/`pending`/`canceled`/`credito`/`debito`. Só sigo por aí se você confirmar explicitamente — caso contrário mantenho a opção sem migration (mais segura, não toca dados existentes).
 
-Após sua aprovação do plano e envio dessas credenciais, implemento em sequência: integração Supabase → layout/auth → Dashboard → Financeiro → Vendas.
+## Passo 3 — Validar
+
+- Criar uma categoria de despesa e uma de receita.
+- Importar um OFX pequeno e finalizar com 1 link + 1 create + 1 ignore.
+- Conferir que `bank_statements`, `transactions` e `categories` recebem linhas sem erro.
+
+## Depois disso
+
+Confirmado o salvamento, sigo o roadmap combinado:
+**Fluxo de Caixa avançado → DRE → Previsões → Indicadores.**
+
+## O que preciso de você agora
+
+1. Resultado do SELECT do Passo 1 (ou print do erro do extrato, se for diferente do de categoria).
+2. Confirmar: **adaptar código** (default, sem migration) ou **alterar o schema** (migration).
