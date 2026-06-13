@@ -43,7 +43,7 @@ function CentrosCustoPage() {
     const m: Record<string, number> = {};
     for (const t of transactions) {
       if (!t.cost_center_id) continue;
-      if (t.type !== "expense") continue;
+      if (t.type !== "despesa") continue;
       if ((t.payment_date ?? t.due_date) < monthStart) continue;
       m[t.cost_center_id] = (m[t.cost_center_id] ?? 0) + Number(t.amount);
     }

@@ -31,8 +31,8 @@ function ContasReceberPage() {
   const qc = useQueryClient();
   const { data: all = [] } = useQuery(transactionsQuery(companyId));
   const { data: customers = [] } = useQuery(customersQuery(companyId));
-  const contas = all.filter((t) => t.type === "income");
-  const total = contas.filter((c) => c.status !== "received" && c.status !== "paid" && c.status !== "canceled").reduce((s, c) => s + Number(c.amount), 0);
+  const contas = all.filter((t) => t.type === "receita");
+  const total = contas.filter((c) => c.status !== "recebido" && c.status !== "pago" && c.status !== "cancelado").reduce((s, c) => s + Number(c.amount), 0);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ description: "", amount: "", due_date: todayISO(), customer_id: "" });
@@ -42,8 +42,8 @@ function ContasReceberPage() {
       if (!companyId) throw new Error("Sem empresa");
       return insertRow<Transaction>("transactions", {
         company_id: companyId,
-        type: "income",
-        status: "pending",
+        type: "receita",
+        status: "pendente",
         description: form.description,
         amount: Number(form.amount.replace(",", ".")),
         due_date: form.due_date,
@@ -61,7 +61,7 @@ function ContasReceberPage() {
 
   const markReceived = useMutation({
     mutationFn: async (id: string) =>
-      updateRow<Transaction>("transactions", id, { status: "received", payment_date: todayISO() }),
+      updateRow<Transaction>("transactions", id, { status: "recebido", payment_date: todayISO() }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transactions", companyId] });
       toast.success("Marcada como recebida");
@@ -144,12 +144,12 @@ function ContasReceberPage() {
                     <TableCell>{formatDateBR(c.due_date)}</TableCell>
                     <TableCell className="text-right font-mono">{formatBRL(Number(c.amount))}</TableCell>
                     <TableCell>
-                      <Badge variant={c.status === "received" || c.status === "paid" ? "default" : overdue ? "destructive" : "secondary"}>
+                      <Badge variant={c.status === "recebido" || c.status === "pago" ? "default" : overdue ? "destructive" : "secondary"}>
                         {overdue ? "Atrasado" : statusLabel(c.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {c.status !== "received" && c.status !== "paid" && (
+                      {c.status !== "recebido" && c.status !== "pago" && (
                         <Button size="sm" variant="outline" onClick={() => markReceived.mutate(c.id)}>
                           <Check className="h-3 w-3 mr-1" />Receber
                         </Button>

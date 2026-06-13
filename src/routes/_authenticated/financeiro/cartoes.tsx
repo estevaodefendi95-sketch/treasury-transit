@@ -110,7 +110,7 @@ function CartoesPage() {
         .filter(
           (t) =>
             t.credit_card_id === selectedCard.id &&
-            t.type === "expense" &&
+            t.type === "despesa" &&
             t.due_date >= selectedCard._cycle.startISO &&
             t.due_date <= selectedCard._cycle.endISO,
         )
@@ -136,8 +136,8 @@ function CartoesPage() {
     }
     const { error } = await supabase.from("transactions").insert({
       company_id: companyId,
-      type: "expense",
-      status: "paid",
+      type: "despesa",
+      status: "pago",
       description: `Pagamento fatura ${selectedCard.name} (${String(cycleMonth).padStart(2, "0")}/${cycleYear})`,
       amount,
       due_date: payForm.date,

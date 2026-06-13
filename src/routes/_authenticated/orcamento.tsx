@@ -60,7 +60,7 @@ function OrcamentoPage() {
   const expenseCategories = useMemo(
     () =>
       categories
-        .filter((c) => c.type === "expense" && c.is_active !== false)
+        .filter((c) => c.type === "despesa" && c.is_active !== false)
         .sort((a, b) => a.name.localeCompare(b.name)),
     [categories],
   );
@@ -100,8 +100,8 @@ function OrcamentoPage() {
   const realizado = useMemo(() => {
     const map: Record<string, number> = {};
     for (const t of transactions) {
-      if (t.type !== "expense") continue;
-      if (t.status !== "paid") continue;
+      if (t.type !== "despesa") continue;
+      if (t.status !== "pago") continue;
       const ref = t.payment_date ?? t.due_date;
       if (!ref) continue;
       const [yStr, mStr] = ref.split("-");

@@ -205,7 +205,7 @@ function ImportarPage() {
               description: descr,
               category_id: m.categoryId || null,
               payment_date: m.row.date,
-              status: m.row.type === "credito" ? "received" : "paid",
+              status: m.row.type === "credito" ? "recebido" : "pago",
               is_reconciled: true,
               bank_statement_import_id: impRec.id,
             })
@@ -216,8 +216,8 @@ function ImportarPage() {
           const approvalStatus = computeApprovalStatus(amount, profile?.role, approvalLimits);
           const inserted = await insertRow<Transaction>("transactions", {
             company_id: companyId,
-            type: m.row.type === "credito" ? "income" : "expense",
-            status: m.row.type === "credito" ? "received" : "paid",
+            type: m.row.type === "credito" ? "receita" : "despesa",
+            status: m.row.type === "credito" ? "recebido" : "pago",
             description: descr,
             amount,
             due_date: m.row.date,
@@ -444,7 +444,7 @@ function ImportarPage() {
               const tierColor = m.confidence >= 0.8 ? "bg-emerald-100 text-emerald-700"
                 : m.confidence >= 0.5 ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600";
               const isIncome = m.row.type === "credito";
-              const cats = categorias.filter((c) => (c.type ?? "expense") === (isIncome ? "income" : "expense"));
+              const cats = categorias.filter((c) => (c.type ?? "despesa") === (isIncome ? "receita" : "despesa"));
               const renamed =
                 m.editedDescription.trim().toLowerCase() !==
                 m.row.originalDescription.toLowerCase();

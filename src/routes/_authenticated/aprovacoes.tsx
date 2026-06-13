@@ -206,8 +206,8 @@ function AprovacoesPage() {
                 <TableRow key={t.id}>
                   <TableCell>{formatDateBR(t.due_date)}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={t.type === "income" ? "text-emerald-700" : "text-rose-700"}>
-                      {t.type === "income" ? "Receita" : "Despesa"}
+                    <Badge variant="outline" className={t.type === "receita" ? "text-emerald-700" : "text-rose-700"}>
+                      {t.type === "receita" ? "Receita" : "Despesa"}
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">{t.description}</TableCell>
@@ -344,7 +344,7 @@ function TransactionDetailContent({ tx, requesterName }: { tx: Transaction; requ
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Tipo</span>
-          <span>{tx.type === "income" ? "Receita" : "Despesa"}</span>
+          <span>{tx.type === "receita" ? "Receita" : "Despesa"}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Solicitante</span>

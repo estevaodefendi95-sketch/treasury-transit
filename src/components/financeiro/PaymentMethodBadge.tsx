@@ -149,7 +149,7 @@ export function PaymentMethodDetails({ tx }: DetailsProps) {
 
 /** Bloco verde com chave PIX em transação de RECEITA — pra cliente pagar facilmente. */
 export function PixReceiveBox({ tx }: { tx: Transaction }) {
-  if (tx.type !== "income" || tx.payment_method !== "pix" || !tx.pix_key) return null;
+  if (tx.type !== "receita" || tx.payment_method !== "pix" || !tx.pix_key) return null;
   const handleCopy = async () => {
     const ok = await copyToClipboard(tx.pix_key!);
     toast[ok ? "success" : "error"](ok ? "Chave PIX copiada!" : "Falha ao copiar");

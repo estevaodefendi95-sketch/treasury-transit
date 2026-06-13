@@ -16,7 +16,7 @@ function getModel() {
 const CategorizeInput = z.object({
   description: z.string().min(1),
   amount: z.number(),
-  type: z.enum(["income", "expense"]),
+  type: z.enum(["receita", "despesa"]),
   categories: z.array(
     z.object({ id: z.string(), name: z.string(), type: z.string() }),
   ),
@@ -43,7 +43,7 @@ export const categorizeTransaction = createServerFn({ method: "POST" })
         prompt: `Transação:
 descrição: "${data.description}"
 valor: R$ ${data.amount.toFixed(2)}
-tipo: ${data.type === "income" ? "receita" : "despesa"}
+tipo: ${data.type === "receita" ? "receita" : "despesa"}
 
 Categorias disponíveis (escolha UMA):
 ${list}

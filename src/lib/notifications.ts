@@ -55,9 +55,9 @@ export async function generateDueDateNotifications(
   const pending = transactions.filter(
     (t) =>
       !t.payment_date &&
-      t.status !== "paid" &&
-      t.status !== "received" &&
-      t.status !== "canceled",
+      t.status !== "pago" &&
+      t.status !== "recebido" &&
+      t.status !== "cancelado",
   );
 
   const buckets: Array<{
@@ -73,7 +73,7 @@ export async function generateDueDateNotifications(
   for (const b of buckets) {
     if (!prefs[b.type]) continue;
     for (const tx of b.list) {
-      const target = tx.type === "income" ? "/financeiro/contas-receber" : "/financeiro/contas-pagar";
+      const target = tx.type === "receita" ? "/financeiro/contas-receber" : "/financeiro/contas-pagar";
       await insertIfNotExists({
         company_id: companyId,
         user_id: userId,
@@ -127,7 +127,7 @@ export async function generateBudgetNotifications(
       .filter(
         (t) =>
           t.category_id === c.id &&
-          t.type === "expense" &&
+          t.type === "despesa" &&
           (t.payment_date ?? t.due_date) >= monthStart,
       )
       .reduce((s, t) => s + Number(t.amount), 0);

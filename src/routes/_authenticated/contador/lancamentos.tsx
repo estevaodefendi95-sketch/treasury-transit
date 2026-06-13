@@ -49,7 +49,7 @@ function ContadorLancamentos() {
                 <TableRow key={t.id}>
                   <TableCell>{formatDateBR(t.due_date)}</TableCell>
                   <TableCell>{t.description}</TableCell>
-                  <TableCell><Badge variant={t.type === "income" ? "default" : "secondary"}>{t.type === "income" ? "Receita" : "Despesa"}</Badge></TableCell>
+                  <TableCell><Badge variant={t.type === "receita" ? "default" : "secondary"}>{t.type === "receita" ? "Receita" : "Despesa"}</Badge></TableCell>
                   <TableCell>{t.status}</TableCell>
                   <TableCell className="text-right font-medium">{formatBRL(Number(t.amount))}</TableCell>
                 </TableRow>

@@ -51,8 +51,8 @@ export function TransferModal({ open, onOpenChange, accounts, companyId }: Props
       const rows = [
         {
           company_id: companyId,
-          type: "transferencia_out",
-          status: "paid",
+          type: "despesa",
+          status: "pago",
           description: `${form.description} → ${toName}`,
           amount,
           due_date: form.date,
@@ -62,8 +62,8 @@ export function TransferModal({ open, onOpenChange, accounts, companyId }: Props
         },
         {
           company_id: companyId,
-          type: "transferencia_in",
-          status: "received",
+          type: "receita",
+          status: "recebido",
           description: `${form.description} ← ${fromName}`,
           amount,
           due_date: form.date,

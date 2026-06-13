@@ -23,11 +23,11 @@ function DashboardPage() {
   const pendingApprovals = transacoes.filter((t) => t.approval_status === "aguardando_aprovacao");
   const projection30 = transacoes.length > 0 ? computeProjection(transacoes, 30) : null;
 
-  const receitas = transacoes.filter((t) => t.type === "income" && (t.status === "received" || t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
-  const despesas = transacoes.filter((t) => t.type === "expense" && (t.status === "paid")).reduce((s, t) => s + Number(t.amount), 0);
+  const receitas = transacoes.filter((t) => t.type === "receita" && (t.status === "recebido" || t.status === "pago")).reduce((s, t) => s + Number(t.amount), 0);
+  const despesas = transacoes.filter((t) => t.type === "despesa" && (t.status === "pago")).reduce((s, t) => s + Number(t.amount), 0);
   const saldo = receitas - despesas;
-  const aPagar = transacoes.filter((t) => t.type === "expense" && t.status !== "paid" && t.status !== "canceled").reduce((s, t) => s + Number(t.amount), 0);
-  const aReceber = transacoes.filter((t) => t.type === "income" && t.status !== "received" && t.status !== "paid" && t.status !== "canceled").reduce((s, t) => s + Number(t.amount), 0);
+  const aPagar = transacoes.filter((t) => t.type === "despesa" && t.status !== "pago" && t.status !== "cancelado").reduce((s, t) => s + Number(t.amount), 0);
+  const aReceber = transacoes.filter((t) => t.type === "receita" && t.status !== "recebido" && t.status !== "pago" && t.status !== "cancelado").reduce((s, t) => s + Number(t.amount), 0);
   const atrasados = transacoes.filter(isOverdue).length;
 
   // Agrupar por dia (últimos 30 dias) para o gráfico
@@ -36,8 +36,8 @@ function DashboardPage() {
     if (!ref) return acc;
     const dia = ref.slice(8, 10) + "/" + ref.slice(5, 7);
     if (!acc[dia]) acc[dia] = { dia, receita: 0, despesa: 0 };
-    if (t.type === "income") acc[dia].receita += Number(t.amount);
-    else if (t.type === "expense") acc[dia].despesa += Number(t.amount);
+    if (t.type === "receita") acc[dia].receita += Number(t.amount);
+    else if (t.type === "despesa") acc[dia].despesa += Number(t.amount);
     return acc;
   }, {});
   const chartData = Object.values(porDia).sort((a, b) => a.dia.localeCompare(b.dia)).slice(-14);

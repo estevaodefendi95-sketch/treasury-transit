@@ -118,10 +118,10 @@ function DRETab() {
       const k = t.category_id ?? "—";
       if (!byCat[k]) byCat[k] = { receita: 0, despesa: 0, transactions: [] };
       byCat[k].transactions.push(t);
-      if (t.type === "income") {
+      if (t.type === "receita") {
         byCat[k].receita += Number(t.amount);
         totReceita += Number(t.amount);
-      } else if (t.type === "expense") {
+      } else if (t.type === "despesa") {
         byCat[k].despesa += Number(t.amount);
         totDespesa += Number(t.amount);
       }
@@ -137,11 +137,11 @@ function DRETab() {
   const allCatIds = Array.from(new Set([...Object.keys(cur.byCat), ...Object.keys(prev.byCat)]));
   const incomeCats = allCatIds.filter((id) => {
     const c = categories.find((x) => x.id === id);
-    return c?.type === "income" || (cur.byCat[id]?.receita ?? 0) > 0;
+    return c?.type === "receita" || (cur.byCat[id]?.receita ?? 0) > 0;
   });
   const expenseCats = allCatIds.filter((id) => {
     const c = categories.find((x) => x.id === id);
-    return c?.type === "expense" || (cur.byCat[id]?.despesa ?? 0) > 0;
+    return c?.type === "despesa" || (cur.byCat[id]?.despesa ?? 0) > 0;
   });
 
   const toggleExpand = (id: string) =>
@@ -368,8 +368,8 @@ function FluxoTab() {
     for (const t of filtered) {
       const d = (t.payment_date ?? t.due_date).slice(0, 10);
       if (!byDay[d]) byDay[d] = { entradas: 0, saidas: 0 };
-      if (t.type === "income") byDay[d].entradas += Number(t.amount);
-      else if (t.type === "expense") byDay[d].saidas += Number(t.amount);
+      if (t.type === "receita") byDay[d].entradas += Number(t.amount);
+      else if (t.type === "despesa") byDay[d].saidas += Number(t.amount);
     }
     let acc = opening;
     return Object.keys(byDay)
@@ -494,11 +494,11 @@ function InadimplenciaTab() {
 
   const overdue = transactions.filter(
     (t) =>
-      t.type === "income" &&
+      t.type === "receita" &&
       !t.payment_date &&
-      t.status !== "paid" &&
-      t.status !== "received" &&
-      t.status !== "canceled" &&
+      t.status !== "pago" &&
+      t.status !== "recebido" &&
+      t.status !== "cancelado" &&
       t.due_date <= today,
   );
 
@@ -627,10 +627,10 @@ function CategoriaTab() {
 
   const rows = useMemo(() => {
     return categories
-      .filter((c) => c.type === "expense" || !c.type)
+      .filter((c) => c.type === "despesa" || !c.type)
       .map((c) => {
         const spent = transactions
-          .filter((t) => t.category_id === c.id && t.type === "expense" && inPeriod(t))
+          .filter((t) => t.category_id === c.id && t.type === "despesa" && inPeriod(t))
           .reduce((s, t) => s + Number(t.amount), 0);
         const budget = Number(c.monthly_budget ?? 0);
         const remaining = budget - spent;
@@ -777,8 +777,8 @@ function CentroTab() {
   const data = useMemo(() => {
     return centers.map((c) => {
       const txs = transactions.filter((t) => t.cost_center_id === c.id && inPeriod(t));
-      const receita = txs.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-      const despesa = txs.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+      const receita = txs.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+      const despesa = txs.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
       return { id: c.id, name: c.name, color: c.color ?? "#64748b", receita, despesa, resultado: receita - despesa, txs };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -861,8 +861,8 @@ function CentroTab() {
                   {drill === r.id && r.txs.map((t) => (
                     <TableRow key={t.id} className="bg-muted/20">
                       <TableCell className="pl-8 text-xs">{formatDateBR(t.payment_date ?? t.due_date)} — {t.description}</TableCell>
-                      <TableCell className="text-right font-mono text-xs">{t.type === "income" ? formatBRL(Number(t.amount)) : ""}</TableCell>
-                      <TableCell className="text-right font-mono text-xs">{t.type === "expense" ? formatBRL(Number(t.amount)) : ""}</TableCell>
+                      <TableCell className="text-right font-mono text-xs">{t.type === "receita" ? formatBRL(Number(t.amount)) : ""}</TableCell>
+                      <TableCell className="text-right font-mono text-xs">{t.type === "despesa" ? formatBRL(Number(t.amount)) : ""}</TableCell>
                       <TableCell></TableCell>
                     </TableRow>
                   ))}

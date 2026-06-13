@@ -40,12 +40,12 @@ function ContadorDashboard() {
     });
   }, [tx, year, month]);
 
-  const receitas = filtered.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-  const despesas = filtered.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+  const receitas = filtered.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+  const despesas = filtered.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
   const resultado = receitas - despesas;
   const saldo = tx
-    .filter((t) => t.status === "paid" || t.status === "received")
-    .reduce((s, t) => s + (t.type === "income" ? Number(t.amount) : -Number(t.amount)), 0);
+    .filter((t) => t.status === "pago" || t.status === "recebido")
+    .reduce((s, t) => s + (t.type === "receita" ? Number(t.amount) : -Number(t.amount)), 0);
 
   const exportDRE = () => {
     const w = window.open("", "_blank");
@@ -75,8 +75,8 @@ function ContadorDashboard() {
     const rows: (string | number)[][] = [["Centro de Custo", "Receitas", "Despesas", "Resultado"]];
     costCenters.forEach((cc) => {
       const ccTx = filtered.filter((t) => t.cost_center_id === cc.id);
-      const r = ccTx.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
-      const d = ccTx.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+      const r = ccTx.filter((t) => t.type === "receita").reduce((s, t) => s + Number(t.amount), 0);
+      const d = ccTx.filter((t) => t.type === "despesa").reduce((s, t) => s + Number(t.amount), 0);
       rows.push([cc.name, r, d, r - d]);
     });
     downloadCSV(`centro_custo_${year}_${String(month).padStart(2, "0")}.csv`, rows);
