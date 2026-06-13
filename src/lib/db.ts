@@ -447,8 +447,6 @@ export const statusLabel = (s: string | null | undefined): string => {
       return "Recebido";
     case "pendente":
       return "Pendente";
-    case "pendente":
-      return "Agendado";
     case "vencido":
       return "Atrasado";
     case "cancelado":
