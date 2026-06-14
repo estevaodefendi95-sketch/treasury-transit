@@ -24,6 +24,9 @@ import {
   Package,
   ChevronDown,
   Building2,
+  UserCircle,
+  ShieldCheck,
+  Palette,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
