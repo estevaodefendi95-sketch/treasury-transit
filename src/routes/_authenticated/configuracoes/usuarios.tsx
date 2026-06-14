@@ -146,10 +146,11 @@ function UsersPage() {
             <div className="py-12 text-center text-sm text-muted-foreground">Carregando...</div>
           ) : filtered.length === 0 && !search ? (
             <EmptyState
-              icon={Users}
+              icon="👥"
               title="Nenhum usuário cadastrado"
               description="Convide membros da equipe para colaborar"
-              action={{ label: "Convidar primeiro usuário", onClick: () => setInviteOpen(true) }}
+              actionLabel="Convidar primeiro usuário"
+              onAction={() => setInviteOpen(true)}
             />
           ) : filtered.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">Nenhum resultado para "{search}"</div>
