@@ -51,6 +51,7 @@ import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './ro
 import { Route as AuthenticatedConfiguracoesCobrancasRouteImport } from './routes/_authenticated/configuracoes/cobrancas'
 import { Route as AuthenticatedConfiguracoesAprovacoesRouteImport } from './routes/_authenticated/configuracoes/aprovacoes'
 import { Route as AuthenticatedCentrosDeCustoRelatorioRouteImport } from './routes/_authenticated/centros-de-custo/relatorio'
+import { Route as AuthenticatedAnalisesIndicadoresRouteImport } from './routes/_authenticated/analises/indicadores'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -293,6 +294,12 @@ const AuthenticatedCentrosDeCustoRelatorioRoute =
     path: '/relatorio',
     getParentRoute: () => AuthenticatedCentrosDeCustoRouteRoute,
   } as any)
+const AuthenticatedAnalisesIndicadoresRoute =
+  AuthenticatedAnalisesIndicadoresRouteImport.update({
+    id: '/analises/indicadores',
+    path: '/analises/indicadores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/orcamento': typeof AuthenticatedOrcamentoRoute
   '/projecao': typeof AuthenticatedProjecaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/analises/indicadores': typeof AuthenticatedAnalisesIndicadoresRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
@@ -349,6 +357,7 @@ export interface FileRoutesByTo {
   '/orcamento': typeof AuthenticatedOrcamentoRoute
   '/projecao': typeof AuthenticatedProjecaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/analises/indicadores': typeof AuthenticatedAnalisesIndicadoresRoute
   '/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
@@ -394,6 +403,7 @@ export interface FileRoutesById {
   '/_authenticated/orcamento': typeof AuthenticatedOrcamentoRoute
   '/_authenticated/projecao': typeof AuthenticatedProjecaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/analises/indicadores': typeof AuthenticatedAnalisesIndicadoresRoute
   '/_authenticated/centros-de-custo/relatorio': typeof AuthenticatedCentrosDeCustoRelatorioRoute
   '/_authenticated/configuracoes/aprovacoes': typeof AuthenticatedConfiguracoesAprovacoesRoute
   '/_authenticated/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/projecao'
     | '/relatorios'
+    | '/analises/indicadores'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
     | '/configuracoes/cobrancas'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/projecao'
     | '/relatorios'
+    | '/analises/indicadores'
     | '/centros-de-custo/relatorio'
     | '/configuracoes/aprovacoes'
     | '/configuracoes/cobrancas'
@@ -525,6 +537,7 @@ export interface FileRouteTypes {
     | '/_authenticated/orcamento'
     | '/_authenticated/projecao'
     | '/_authenticated/relatorios'
+    | '/_authenticated/analises/indicadores'
     | '/_authenticated/centros-de-custo/relatorio'
     | '/_authenticated/configuracoes/aprovacoes'
     | '/_authenticated/configuracoes/cobrancas'
@@ -859,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCentrosDeCustoRelatorioRouteImport
       parentRoute: typeof AuthenticatedCentrosDeCustoRouteRoute
     }
+    '/_authenticated/analises/indicadores': {
+      id: '/_authenticated/analises/indicadores'
+      path: '/analises/indicadores'
+      fullPath: '/analises/indicadores'
+      preLoaderRoute: typeof AuthenticatedAnalisesIndicadoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -911,6 +931,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrcamentoRoute: typeof AuthenticatedOrcamentoRoute
   AuthenticatedProjecaoRoute: typeof AuthenticatedProjecaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedAnalisesIndicadoresRoute: typeof AuthenticatedAnalisesIndicadoresRoute
   AuthenticatedConfiguracoesAprovacoesRoute: typeof AuthenticatedConfiguracoesAprovacoesRoute
   AuthenticatedConfiguracoesCobrancasRoute: typeof AuthenticatedConfiguracoesCobrancasRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
@@ -947,6 +968,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrcamentoRoute: AuthenticatedOrcamentoRoute,
   AuthenticatedProjecaoRoute: AuthenticatedProjecaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedAnalisesIndicadoresRoute: AuthenticatedAnalisesIndicadoresRoute,
   AuthenticatedConfiguracoesAprovacoesRoute:
     AuthenticatedConfiguracoesAprovacoesRoute,
   AuthenticatedConfiguracoesCobrancasRoute:
@@ -1000,3 +1022,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

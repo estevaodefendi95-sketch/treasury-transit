@@ -55,6 +55,35 @@ function downloadCSV(filename: string, rows: (string | number)[][]) {
   URL.revokeObjectURL(url);
 }
 
+function printElementAsPDF(elementId: string, title: string) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const win = window.open("", "_blank", "width=1024,height=768");
+  if (!win) return;
+  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8" />
+  <title>${title}</title>
+  <style>
+    * { font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { margin: 24px; color: #0f172a; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    .sub { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { background: #f1f5f9; }
+    tr.section td { background: #f8fafc; font-weight: 700; text-align: left; }
+    tr.total td { font-weight: 700; border-top: 2px solid #cbd5e1; }
+    tr.result td { font-weight: 800; border-top: 3px solid #94a3b8; background: #eef2ff; }
+  </style></head><body>
+  <h1>${title}</h1>
+  <div class="sub">Gerado em ${new Date().toLocaleDateString("pt-BR")} ${new Date().toLocaleTimeString("pt-BR")}</div>
+  ${el.innerHTML}
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 300);
+}
+
 function RelatoriosPage() {
   return (
     <div className="space-y-6">
@@ -132,6 +161,27 @@ function DRETab() {
   const cur = aggregate(current);
   const prev = aggregate(previous);
 
+  // Visão anual: 12 colunas (jan–dez) do ano selecionado.
+  // Agrega por mês independentemente do toggle `annual` (que muda o periodKey).
+  const aggregateMonth = (ym: string) => {
+    let receita = 0;
+    let despesa = 0;
+    for (const t of transactions) {
+      const d = (t.payment_date ?? t.due_date).slice(0, 7);
+      if (d !== ym) continue;
+      if (t.type === "receita") receita += Number(t.amount);
+      else if (t.type === "despesa") despesa += Number(t.amount);
+    }
+    return { receita, despesa, resultado: receita - despesa };
+  };
+  const monthKeys = Array.from({ length: 12 }, (_, i) => `${year}-${String(i + 1).padStart(2, "0")}`);
+  const monthShort = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const annualByMonth = annual ? monthKeys.map(aggregateMonth) : [];
+  const annualTotals = annualByMonth.reduce(
+    (a, m) => ({ receita: a.receita + m.receita, despesa: a.despesa + m.despesa, resultado: a.resultado + m.resultado }),
+    { receita: 0, despesa: 0, resultado: 0 },
+  );
+
   const variance = (a: number, b: number) => (b === 0 ? (a > 0 ? 100 : 0) : ((a - b) / b) * 100);
 
   const allCatIds = Array.from(new Set([...Object.keys(cur.byCat), ...Object.keys(prev.byCat)]));
@@ -208,19 +258,72 @@ function DRETab() {
             <input type="checkbox" checked={annual} onChange={(e) => setAnnual(e.target.checked)} />
             Visão anual
           </label>
-          <div className="ml-auto">
+          <div className="ml-auto flex gap-2">
             <Button variant="outline" onClick={exportCSV}>
               <Download className="h-4 w-4 mr-1" /> Exportar CSV
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => printElementAsPDF("dre-print", `DRE — ${annual ? year : `${String(month).padStart(2, "0")}/${year}`}`)}
+            >
+              <Printer className="h-4 w-4 mr-1" /> Exportar PDF
             </Button>
           </div>
         </CardContent>
       </Card>
 
+      {annual ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">DRE Anual — {year}</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto" id="dre-print">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[110px]"></TableHead>
+                  {monthShort.map((m) => (
+                    <TableHead key={m} className="text-right">{m}</TableHead>
+                  ))}
+                  <TableHead className="text-right font-bold">Ano</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="font-semibold">
+                  <TableCell>(+) Receitas</TableCell>
+                  {annualByMonth.map((m, i) => (
+                    <TableCell key={i} className="text-right font-mono text-emerald-700">{formatBRL(m.receita)}</TableCell>
+                  ))}
+                  <TableCell className="text-right font-mono text-emerald-700 font-bold">{formatBRL(annualTotals.receita)}</TableCell>
+                </TableRow>
+                <TableRow className="font-semibold">
+                  <TableCell>(−) Despesas</TableCell>
+                  {annualByMonth.map((m, i) => (
+                    <TableCell key={i} className="text-right font-mono text-rose-700">{formatBRL(m.despesa)}</TableCell>
+                  ))}
+                  <TableCell className="text-right font-mono text-rose-700 font-bold">{formatBRL(annualTotals.despesa)}</TableCell>
+                </TableRow>
+                <TableRow className="font-bold border-t-2 bg-primary/5">
+                  <TableCell>(=) Resultado</TableCell>
+                  {annualByMonth.map((m, i) => (
+                    <TableCell key={i} className={`text-right font-mono ${m.resultado >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                      {formatBRL(m.resultado)}
+                    </TableCell>
+                  ))}
+                  <TableCell className={`text-right font-mono font-bold ${annualTotals.resultado >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                    {formatBRL(annualTotals.resultado)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      ) : (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">DRE — {annual ? year : `${String(month).padStart(2, "0")}/${year}`}</CardTitle>
+          <CardTitle className="text-base">DRE — {`${String(month).padStart(2, "0")}/${year}`}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent id="dre-print">
           <Table>
             <TableHeader>
               <TableRow>
@@ -333,6 +436,7 @@ function DRETab() {
           </Table>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

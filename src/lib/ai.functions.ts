@@ -222,3 +222,52 @@ Comece com "Olá, ${data.customer_name}!" e termine se colocando à disposição
       };
     }
   });
+
+// ---------- 6) Insight de indicadores (KPIs) ----------
+const IndicatorsInput = z.object({
+  periodo: z.string(),
+  margem_bruta: z.number(),
+  margem_liquida: z.number(),
+  ticket_medio: z.number(),
+  ponto_equilibrio: z.number(),
+  dias_de_caixa: z.number(),
+  receita: z.number(),
+  despesa: z.number(),
+});
+
+export const indicatorsInsight = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => IndicatorsInput.parse(d))
+  .handler(async ({ data }) => {
+    const fmt = (n: number) =>
+      n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const pct = (n: number) => `${n.toFixed(1)}%`;
+    try {
+      const { text } = await generateText({
+        model: getModel(),
+        system:
+          "Você é um consultor financeiro brasileiro para PMEs. Seja conciso e prático. Responda SEMPRE em português do Brasil.",
+        prompt: `Analise os indicadores financeiros do período ${data.periodo}:
+Margem Bruta: ${pct(data.margem_bruta)}
+Margem Líquida: ${pct(data.margem_liquida)}
+Ticket Médio: ${fmt(data.ticket_medio)}
+Ponto de Equilíbrio (mensal): ${fmt(data.ponto_equilibrio)}
+Dias de Caixa: ${data.dias_de_caixa.toFixed(0)} dias
+Receita no período: ${fmt(data.receita)}
+Despesa no período: ${fmt(data.despesa)}
+
+Escreva EXATAMENTE 3 frases curtas em português:
+1. Avaliação geral da rentabilidade e saúde do negócio.
+2. O indicador que mais merece atenção e por quê.
+3. Uma recomendação prática e específica.
+
+Não use marcadores, numeração ou títulos. Apenas 3 frases corridas.`,
+      });
+      return { insight: text.trim() };
+    } catch (e) {
+      console.error("indicatorsInsight error", e);
+      return {
+        insight:
+          "Não foi possível gerar a análise no momento. Verifique sua conexão e tente novamente.",
+      };
+    }
+  });

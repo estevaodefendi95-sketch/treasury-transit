@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
   Bar,
@@ -29,6 +31,7 @@ import {
   todayISO,
   type Transaction,
 } from "@/lib/db";
+import { computeProjection } from "@/lib/projection";
 
 export const Route = createFileRoute("/_authenticated/financeiro/fluxo-caixa")({
   ssr: false,
@@ -67,6 +70,7 @@ function FluxoCaixaPage() {
   const [periodo, setPeriodo] = useState<Periodo>("30");
   const [visao, setVisao] = useState<Visao>("realizado");
   const [contaFiltro, setContaFiltro] = useState<string>("todas");
+  const [projetar, setProjetar] = useState(false);
 
   const hoje = todayISO();
   const inicio = addDays(hoje, -Number(periodo));
@@ -129,6 +133,33 @@ function FluxoCaixaPage() {
     });
   }, [filtradas, visao, agrupaPorMes]);
 
+  // Projeção +30 dias (linha pontilhada) — continua o saldo acumulado para o futuro.
+  // Só faz sentido na visão diária (não agrupada por mês).
+  const acumuladoComProjecao = useMemo(() => {
+    const base = serie.map((d) => ({ ...d, projecao: null as number | null }));
+    if (!projetar || agrupaPorMes || base.length === 0) return base;
+
+    const proj = computeProjection(transacoes, 30);
+    const lastAcc = base[base.length - 1].acumulado;
+    // Conecta a projeção ao último ponto histórico
+    base[base.length - 1].projecao = lastAcc;
+
+    let acc = lastAcc;
+    const futuro = proj.points.slice(1).map((p, i) => {
+      const anterior = proj.points[i]; // ponto i da lista original (deslocado por slice)
+      acc += p.projetado - anterior.projetado;
+      return {
+        rotulo: p.dia,
+        entradas: 0,
+        saidas: 0,
+        saldo: 0,
+        acumulado: null as unknown as number,
+        projecao: Math.round(acc * 100) / 100,
+      };
+    });
+    return [...base, ...futuro];
+  }, [serie, projetar, agrupaPorMes, transacoes]);
+
   // Top categorias
   const catMap = new Map(categorias.map((c) => [c.id, c.name]));
   const topCategorias = (tipo: "receita" | "despesa") => {
@@ -180,6 +211,17 @@ function FluxoCaixaPage() {
             ))}
           </SelectContent>
         </Select>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="projetar"
+            checked={projetar}
+            onCheckedChange={setProjetar}
+            disabled={agrupaPorMes}
+          />
+          <Label htmlFor="projetar" className={agrupaPorMes ? "text-muted-foreground" : ""}>
+            Projeção +30 dias
+          </Label>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -219,14 +261,16 @@ function FluxoCaixaPage() {
       {/* Saldo acumulado */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Saldo acumulado no período</CardTitle>
+          <CardTitle className="text-base">
+            Saldo acumulado no período{projetar && !agrupaPorMes ? " + projeção 30 dias" : ""}
+          </CardTitle>
         </CardHeader>
         <CardContent className="h-64">
           {serie.length === 0 ? (
             <div className="h-full flex items-center justify-center text-sm text-muted-foreground">—</div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={serie}>
+              <AreaChart data={acumuladoComProjecao}>
                 <defs>
                   <linearGradient id="accColor" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0.3} />
@@ -237,8 +281,21 @@ function FluxoCaixaPage() {
                 <XAxis dataKey="rotulo" fontSize={11} />
                 <YAxis fontSize={11} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(v: number) => formatBRL(v)} />
+                <Legend />
                 <ReferenceLine y={0} stroke="hsl(0, 72%, 51%)" strokeDasharray="4 4" />
-                <Area type="monotone" dataKey="acumulado" name="Acumulado" stroke="hsl(217, 91%, 60%)" fill="url(#accColor)" strokeWidth={2} />
+                <Area type="monotone" dataKey="acumulado" name="Acumulado" stroke="hsl(217, 91%, 60%)" fill="url(#accColor)" strokeWidth={2} connectNulls={false} />
+                {projetar && !agrupaPorMes && (
+                  <Area
+                    type="monotone"
+                    dataKey="projecao"
+                    name="Projeção"
+                    stroke="hsl(262, 83%, 58%)"
+                    fill="none"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    connectNulls={false}
+                  />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           )}

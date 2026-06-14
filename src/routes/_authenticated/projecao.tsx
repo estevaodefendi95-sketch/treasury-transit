@@ -55,6 +55,31 @@ function ProjecaoPage() {
   );
   const breakeven = useMemo(() => computeBreakeven(transacoes), [transacoes]);
 
+  // Agrupamento por faixa de tempo (0-30 / 31-60 / 61-90 dias) das previsões
+  const buckets = useMemo(() => {
+    const DEAD = new Set(["pago", "recebido", "cancelado"]);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const faixas = [
+      { label: "0–30 dias", min: 0, max: 30, entradas: 0, saidas: 0 },
+      { label: "31–60 dias", min: 31, max: 60, entradas: 0, saidas: 0 },
+      { label: "61–90 dias", min: 61, max: 90, entradas: 0, saidas: 0 },
+    ];
+    for (const t of transacoes) {
+      if (DEAD.has(String(t.status))) continue;
+      if (!t.due_date) continue;
+      const diff = Math.round(
+        (new Date(t.due_date + "T00:00:00").getTime() - hoje.getTime()) / 86_400_000,
+      );
+      if (diff < 0 || diff > days) continue;
+      const f = faixas.find((x) => diff >= x.min && diff <= x.max);
+      if (!f) continue;
+      if (t.type === "receita") f.entradas += Number(t.amount);
+      else if (t.type === "despesa") f.saidas += Number(t.amount);
+    }
+    return faixas.filter((f) => f.min < days || f.label.startsWith("0"));
+  }, [transacoes, days]);
+
   const ai = useServerFn(cashflowNarrative);
   const narrativeMut = useMutation({
     mutationFn: () =>
@@ -245,6 +270,40 @@ function ProjecaoPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Previsões por faixa de tempo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {buckets.map((f) => {
+              const saldo = f.entradas - f.saidas;
+              return (
+                <div key={f.label} className="rounded-lg border p-3">
+                  <div className="text-xs font-medium text-muted-foreground">{f.label}</div>
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-emerald-700">Entradas</span>
+                      <span className="font-mono text-emerald-700">{formatBRL(f.entradas)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-rose-700">Saídas</span>
+                      <span className="font-mono text-rose-700">{formatBRL(f.saidas)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm border-t pt-1 mt-1">
+                      <span className="font-medium">Saldo</span>
+                      <span className={`font-mono font-semibold ${saldo >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                        {formatBRL(saldo)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
