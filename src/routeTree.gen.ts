@@ -43,6 +43,9 @@ import { Route as AuthenticatedContadorRelatoriosRouteImport } from './routes/_a
 import { Route as AuthenticatedContadorLancamentosRouteImport } from './routes/_authenticated/contador/lancamentos'
 import { Route as AuthenticatedContadorExportarRouteImport } from './routes/_authenticated/contador/exportar'
 import { Route as AuthenticatedContadorDashboardRouteImport } from './routes/_authenticated/contador/dashboard'
+import { Route as AuthenticatedConfiguracoesUsuariosRouteImport } from './routes/_authenticated/configuracoes/usuarios'
+import { Route as AuthenticatedConfiguracoesPermissoesRouteImport } from './routes/_authenticated/configuracoes/permissoes'
+import { Route as AuthenticatedConfiguracoesPerfilRouteImport } from './routes/_authenticated/configuracoes/perfil'
 import { Route as AuthenticatedConfiguracoesOpenBankingRouteImport } from './routes/_authenticated/configuracoes/open-banking'
 import { Route as AuthenticatedConfiguracoesNotificacoesRouteImport } from './routes/_authenticated/configuracoes/notificacoes'
 import { Route as AuthenticatedConfiguracoesCobrancasRouteImport } from './routes/_authenticated/configuracoes/cobrancas'
@@ -242,6 +245,24 @@ const AuthenticatedContadorDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedContadorRouteRoute,
   } as any)
+const AuthenticatedConfiguracoesUsuariosRoute =
+  AuthenticatedConfiguracoesUsuariosRouteImport.update({
+    id: '/configuracoes/usuarios',
+    path: '/configuracoes/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConfiguracoesPermissoesRoute =
+  AuthenticatedConfiguracoesPermissoesRouteImport.update({
+    id: '/configuracoes/permissoes',
+    path: '/configuracoes/permissoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConfiguracoesPerfilRoute =
+  AuthenticatedConfiguracoesPerfilRouteImport.update({
+    id: '/configuracoes/perfil',
+    path: '/configuracoes/perfil',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConfiguracoesOpenBankingRoute =
   AuthenticatedConfiguracoesOpenBankingRouteImport.update({
     id: '/configuracoes/open-banking',
@@ -291,6 +312,9 @@ export interface FileRoutesByFullPath {
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/configuracoes/perfil': typeof AuthenticatedConfiguracoesPerfilRoute
+  '/configuracoes/permissoes': typeof AuthenticatedConfiguracoesPermissoesRoute
+  '/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
   '/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
   '/contador/exportar': typeof AuthenticatedContadorExportarRoute
   '/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
@@ -330,6 +354,9 @@ export interface FileRoutesByTo {
   '/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/configuracoes/perfil': typeof AuthenticatedConfiguracoesPerfilRoute
+  '/configuracoes/permissoes': typeof AuthenticatedConfiguracoesPermissoesRoute
+  '/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
   '/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
   '/contador/exportar': typeof AuthenticatedContadorExportarRoute
   '/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
@@ -372,6 +399,9 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes/cobrancas': typeof AuthenticatedConfiguracoesCobrancasRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesRoute
   '/_authenticated/configuracoes/open-banking': typeof AuthenticatedConfiguracoesOpenBankingRoute
+  '/_authenticated/configuracoes/perfil': typeof AuthenticatedConfiguracoesPerfilRoute
+  '/_authenticated/configuracoes/permissoes': typeof AuthenticatedConfiguracoesPermissoesRoute
+  '/_authenticated/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
   '/_authenticated/contador/dashboard': typeof AuthenticatedContadorDashboardRoute
   '/_authenticated/contador/exportar': typeof AuthenticatedContadorExportarRoute
   '/_authenticated/contador/lancamentos': typeof AuthenticatedContadorLancamentosRoute
@@ -414,6 +444,9 @@ export interface FileRouteTypes {
     | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
     | '/configuracoes/open-banking'
+    | '/configuracoes/perfil'
+    | '/configuracoes/permissoes'
+    | '/configuracoes/usuarios'
     | '/contador/dashboard'
     | '/contador/exportar'
     | '/contador/lancamentos'
@@ -453,6 +486,9 @@ export interface FileRouteTypes {
     | '/configuracoes/cobrancas'
     | '/configuracoes/notificacoes'
     | '/configuracoes/open-banking'
+    | '/configuracoes/perfil'
+    | '/configuracoes/permissoes'
+    | '/configuracoes/usuarios'
     | '/contador/dashboard'
     | '/contador/exportar'
     | '/contador/lancamentos'
@@ -494,6 +530,9 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes/cobrancas'
     | '/_authenticated/configuracoes/notificacoes'
     | '/_authenticated/configuracoes/open-banking'
+    | '/_authenticated/configuracoes/perfil'
+    | '/_authenticated/configuracoes/permissoes'
+    | '/_authenticated/configuracoes/usuarios'
     | '/_authenticated/contador/dashboard'
     | '/_authenticated/contador/exportar'
     | '/_authenticated/contador/lancamentos'
@@ -764,6 +803,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContadorDashboardRouteImport
       parentRoute: typeof AuthenticatedContadorRouteRoute
     }
+    '/_authenticated/configuracoes/usuarios': {
+      id: '/_authenticated/configuracoes/usuarios'
+      path: '/configuracoes/usuarios'
+      fullPath: '/configuracoes/usuarios'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/configuracoes/permissoes': {
+      id: '/_authenticated/configuracoes/permissoes'
+      path: '/configuracoes/permissoes'
+      fullPath: '/configuracoes/permissoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesPermissoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/configuracoes/perfil': {
+      id: '/_authenticated/configuracoes/perfil'
+      path: '/configuracoes/perfil'
+      fullPath: '/configuracoes/perfil'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/configuracoes/open-banking': {
       id: '/_authenticated/configuracoes/open-banking'
       path: '/configuracoes/open-banking'
@@ -855,6 +915,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesCobrancasRoute: typeof AuthenticatedConfiguracoesCobrancasRoute
   AuthenticatedConfiguracoesNotificacoesRoute: typeof AuthenticatedConfiguracoesNotificacoesRoute
   AuthenticatedConfiguracoesOpenBankingRoute: typeof AuthenticatedConfiguracoesOpenBankingRoute
+  AuthenticatedConfiguracoesPerfilRoute: typeof AuthenticatedConfiguracoesPerfilRoute
+  AuthenticatedConfiguracoesPermissoesRoute: typeof AuthenticatedConfiguracoesPermissoesRoute
+  AuthenticatedConfiguracoesUsuariosRoute: typeof AuthenticatedConfiguracoesUsuariosRoute
   AuthenticatedFinanceiroCalendarioRoute: typeof AuthenticatedFinanceiroCalendarioRoute
   AuthenticatedFinanceiroCartoesRoute: typeof AuthenticatedFinanceiroCartoesRoute
   AuthenticatedFinanceiroCategoriasRoute: typeof AuthenticatedFinanceiroCategoriasRoute
@@ -892,6 +955,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConfiguracoesNotificacoesRoute,
   AuthenticatedConfiguracoesOpenBankingRoute:
     AuthenticatedConfiguracoesOpenBankingRoute,
+  AuthenticatedConfiguracoesPerfilRoute: AuthenticatedConfiguracoesPerfilRoute,
+  AuthenticatedConfiguracoesPermissoesRoute:
+    AuthenticatedConfiguracoesPermissoesRoute,
+  AuthenticatedConfiguracoesUsuariosRoute:
+    AuthenticatedConfiguracoesUsuariosRoute,
   AuthenticatedFinanceiroCalendarioRoute:
     AuthenticatedFinanceiroCalendarioRoute,
   AuthenticatedFinanceiroCartoesRoute: AuthenticatedFinanceiroCartoesRoute,
@@ -932,13 +1000,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
