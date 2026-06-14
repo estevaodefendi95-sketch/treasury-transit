@@ -24,6 +24,9 @@ import {
   Package,
   ChevronDown,
   Building2,
+  UserCircle,
+  ShieldCheck,
+  Palette,
 } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
@@ -244,15 +247,58 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <Item url="/notificacoes" icon={Bell} title="Notificações" pathname={pathname} collapsed={collapsed} />
-              {isAdmin && (
-                <Item url="/aprovacoes" icon={ClipboardCheck} title="Aprovações" pathname={pathname} collapsed={collapsed} />
-              )}
-              <Item url="/configuracoes" icon={Settings} title="Configurações" pathname={pathname} collapsed={collapsed} />
+              <ConfigGroup collapsed={collapsed} pathname={pathname} isAdmin={isAdmin} />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
+  );
+}
+
+function ConfigGroup({ collapsed, pathname, isAdmin }: { collapsed: boolean; pathname: string; isAdmin: boolean }) {
+  const items = [
+    { title: "Perfil", url: "/configuracoes/perfil", icon: UserCircle, show: true },
+    { title: "Usuários", url: "/configuracoes/usuarios", icon: Users, show: isAdmin },
+    { title: "Permissões", url: "/configuracoes/permissoes", icon: ShieldCheck, show: isAdmin },
+    { title: "Personalização", url: "/configuracoes", icon: Palette, show: true },
+    { title: "Notificações", url: "/configuracoes/notificacoes", icon: Bell, show: true },
+    { title: "Aprovações", url: "/configuracoes/aprovacoes", icon: ClipboardCheck, show: isAdmin },
+  ].filter((i) => i.show);
+  const inGroup = pathname.startsWith("/configuracoes");
+  const [open, setOpen] = useState(inGroup);
+  return (
+    <Collapsible open={open || collapsed} onOpenChange={setOpen}>
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton isActive={inGroup}>
+            <Settings className="h-4 w-4" />
+            {!collapsed && (
+              <>
+                <span>Configurações</span>
+                <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")} />
+              </>
+            )}
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        {!collapsed && (
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {items.map((item) => (
+                <SidebarMenuSubItem key={item.url}>
+                  <SidebarMenuSubButton asChild isActive={pathname === item.url}>
+                    <Link to={item.url}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        )}
+      </SidebarMenuItem>
+    </Collapsible>
   );
 }
 
