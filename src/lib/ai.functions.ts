@@ -23,7 +23,7 @@ const CategorizeInput = z.object({
 });
 
 export const categorizeTransaction = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => CategorizeInput.parse(d))
+  .validator((d: unknown) => CategorizeInput.parse(d))
   .handler(async ({ data }) => {
     const eligible = data.categories.filter(
       (c) => !c.type || c.type === data.type,
@@ -74,7 +74,7 @@ Responda com a melhor categoria. confidence = probabilidade (0 a 1). reason curt
 const ParsePdfInput = z.object({ text: z.string().min(10) });
 
 export const parsePdfStatement = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => ParsePdfInput.parse(d))
+  .validator((d: unknown) => ParsePdfInput.parse(d))
   .handler(async ({ data }) => {
     const truncated = data.text.slice(0, 30000);
     const { output } = await generateText({
@@ -108,7 +108,7 @@ const LearnNameInput = z.object({
 });
 
 export const learnNameRule = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => LearnNameInput.parse(d))
+  .validator((d: unknown) => LearnNameInput.parse(d))
   .handler(async ({ data }) => {
     const { output } = await generateText({
       model: getModel(),
@@ -141,7 +141,7 @@ const CashflowInput = z.object({
 });
 
 export const cashflowNarrative = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => CashflowInput.parse(d))
+  .validator((d: unknown) => CashflowInput.parse(d))
   .handler(async ({ data }) => {
     const fmt = (n: number) =>
       n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -184,7 +184,7 @@ const ChargingInput = z.object({
 });
 
 export const chargingMessage = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => ChargingInput.parse(d))
+  .validator((d: unknown) => ChargingInput.parse(d))
   .handler(async ({ data }) => {
     const fmt = (n: number) =>
       n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -236,7 +236,7 @@ const IndicatorsInput = z.object({
 });
 
 export const indicatorsInsight = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => IndicatorsInput.parse(d))
+  .validator((d: unknown) => IndicatorsInput.parse(d))
   .handler(async ({ data }) => {
     const fmt = (n: number) =>
       n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
