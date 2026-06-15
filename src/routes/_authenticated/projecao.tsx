@@ -245,7 +245,7 @@ function ProjecaoPage() {
             ) : narrativeMut.data ? (
               <div className="text-sm leading-relaxed whitespace-pre-wrap flex gap-3">
                 <span className="text-xl leading-none">🤖</span>
-                <span>{narrativeMut.data.narrative}</span>
+                <span>{(narrativeMut.data as { narrative: string }).narrative}</span>
               </div>
             ) : (
               <div className="text-sm text-muted-foreground">

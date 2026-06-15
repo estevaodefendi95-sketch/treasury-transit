@@ -83,7 +83,7 @@ function ImportarPage() {
         const text = await extractPdfText(file);
         toast.info("Analisando com IA...");
         const aiRows = await parsePdf({ data: { text } });
-        parsed = aiRows.map((r) => ({
+        parsed = aiRows.map((r: { date: string; description: string; amount: number; type: "credito" | "debito" }) => ({
           fitid: crypto.randomUUID(),
           date: r.date,
           description: r.description,
