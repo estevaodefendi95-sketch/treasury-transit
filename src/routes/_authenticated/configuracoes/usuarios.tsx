@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { MoreVertical, UserPlus, Users, Search, Pencil, Mail, Pause, Play, Trash2 } from "lucide-react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { inviteUser } from "@/lib/users.functions";
 import {
   ROLE_OPTIONS, ROLE_LABEL, ROLE_BADGE, ROLE_AVATAR_BG, ROLE_LIMIT,
   STATUS_BADGE, STATUS_LABEL, initialsOf, formatDateTimeBR, roleLimitLabel,
