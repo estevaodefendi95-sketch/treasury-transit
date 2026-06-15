@@ -289,7 +289,7 @@ function IndicadoresPage() {
           ) : insightMut.data ? (
             <div className="text-sm leading-relaxed whitespace-pre-wrap flex gap-3">
               <span className="text-xl leading-none">🤖</span>
-              <span>{insightMut.data.insight}</span>
+              <span>{(insightMut.data as { insight: string }).insight}</span>
             </div>
           ) : (
             <div className="text-sm text-muted-foreground">
