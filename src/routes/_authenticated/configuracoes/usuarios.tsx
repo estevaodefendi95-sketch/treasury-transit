@@ -302,6 +302,8 @@ function InviteUserModal({
   const [role, setRole] = useState<Role>("financeiro");
   const [saving, setSaving] = useState(false);
 
+  const invite = useServerFn(inviteUser);
+
   const reset = () => { setFullName(""); setEmail(""); setRole("financeiro"); };
 
   const submit = async () => {
@@ -312,15 +314,16 @@ function InviteUserModal({
     }
     setSaving(true);
     try {
-      const { error } = await supabase.from("profiles").insert({
-        id: crypto.randomUUID(),
-        company_id: companyId,
-        full_name: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        role,
-        status: "convite_pendente",
-      } as never);
-      if (error) throw error;
+      const res = await invite({
+        data: {
+          email: email.trim().toLowerCase(),
+          full_name: fullName.trim(),
+          role,
+          company_id: companyId,
+          redirect_to: `${window.location.origin}/auth`,
+        },
+      });
+      if (!res.ok) throw new Error(res.error);
       toast.success(`Convite enviado para ${email}`);
       reset();
       onClose();
