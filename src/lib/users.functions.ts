@@ -10,7 +10,7 @@ const InviteInput = z.object({
 });
 
 export const inviteUser = createServerFn({ method: "POST" })
-  .validator((d: unknown) => InviteInput.parse(d))
+  .inputValidator((d: unknown) => InviteInput.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
