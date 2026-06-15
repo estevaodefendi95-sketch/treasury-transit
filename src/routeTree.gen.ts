@@ -20,13 +20,16 @@ import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCobrancasRouteImport } from './routes/_authenticated/cobrancas'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedMasterRouteRouteImport } from './routes/_authenticated/master/route'
 import { Route as AuthenticatedContadorRouteRouteImport } from './routes/_authenticated/contador/route'
 import { Route as AuthenticatedCentrosDeCustoRouteRouteImport } from './routes/_authenticated/centros-de-custo/route'
+import { Route as AuthenticatedMasterIndexRouteImport } from './routes/_authenticated/master/index'
 import { Route as AuthenticatedConfiguracoesIndexRouteImport } from './routes/_authenticated/configuracoes/index'
 import { Route as AuthenticatedCentrosDeCustoIndexRouteImport } from './routes/_authenticated/centros-de-custo/index'
 import { Route as AuthenticatedVendasProdutosRouteImport } from './routes/_authenticated/vendas/produtos'
 import { Route as AuthenticatedVendasPedidosRouteImport } from './routes/_authenticated/vendas/pedidos'
 import { Route as AuthenticatedVendasClientesRouteImport } from './routes/_authenticated/vendas/clientes'
+import { Route as AuthenticatedMasterConvitesRouteImport } from './routes/_authenticated/master/convites'
 import { Route as AuthenticatedFinanceiroTransacoesRouteImport } from './routes/_authenticated/financeiro/transacoes'
 import { Route as AuthenticatedFinanceiroRegrasNomesRouteImport } from './routes/_authenticated/financeiro/regras-nomes'
 import { Route as AuthenticatedFinanceiroImportarNfeRouteImport } from './routes/_authenticated/financeiro/importar-nfe'
@@ -52,6 +55,9 @@ import { Route as AuthenticatedConfiguracoesCobrancasRouteImport } from './route
 import { Route as AuthenticatedConfiguracoesAprovacoesRouteImport } from './routes/_authenticated/configuracoes/aprovacoes'
 import { Route as AuthenticatedCentrosDeCustoRelatorioRouteImport } from './routes/_authenticated/centros-de-custo/relatorio'
 import { Route as AuthenticatedAnalisesIndicadoresRouteImport } from './routes/_authenticated/analises/indicadores'
+import { Route as AuthenticatedMasterEmpresasIndexRouteImport } from './routes/_authenticated/master/empresas/index'
+import { Route as AuthenticatedMasterEmpresasNovaRouteImport } from './routes/_authenticated/master/empresas/nova'
+import { Route as AuthenticatedMasterEmpresasIdRouteImport } from './routes/_authenticated/master/empresas/$id'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -108,6 +114,12 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMasterRouteRoute =
+  AuthenticatedMasterRouteRouteImport.update({
+    id: '/master',
+    path: '/master',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContadorRouteRoute =
   AuthenticatedContadorRouteRouteImport.update({
     id: '/contador',
@@ -119,6 +131,12 @@ const AuthenticatedCentrosDeCustoRouteRoute =
     id: '/centros-de-custo',
     path: '/centros-de-custo',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMasterIndexRoute =
+  AuthenticatedMasterIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMasterRouteRoute,
   } as any)
 const AuthenticatedConfiguracoesIndexRoute =
   AuthenticatedConfiguracoesIndexRouteImport.update({
@@ -149,6 +167,12 @@ const AuthenticatedVendasClientesRoute =
     id: '/vendas/clientes',
     path: '/vendas/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMasterConvitesRoute =
+  AuthenticatedMasterConvitesRouteImport.update({
+    id: '/convites',
+    path: '/convites',
+    getParentRoute: () => AuthenticatedMasterRouteRoute,
   } as any)
 const AuthenticatedFinanceiroTransacoesRoute =
   AuthenticatedFinanceiroTransacoesRouteImport.update({
@@ -300,6 +324,24 @@ const AuthenticatedAnalisesIndicadoresRoute =
     path: '/analises/indicadores',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMasterEmpresasIndexRoute =
+  AuthenticatedMasterEmpresasIndexRouteImport.update({
+    id: '/empresas/',
+    path: '/empresas/',
+    getParentRoute: () => AuthenticatedMasterRouteRoute,
+  } as any)
+const AuthenticatedMasterEmpresasNovaRoute =
+  AuthenticatedMasterEmpresasNovaRouteImport.update({
+    id: '/empresas/nova',
+    path: '/empresas/nova',
+    getParentRoute: () => AuthenticatedMasterRouteRoute,
+  } as any)
+const AuthenticatedMasterEmpresasIdRoute =
+  AuthenticatedMasterEmpresasIdRouteImport.update({
+    id: '/empresas/$id',
+    path: '/empresas/$id',
+    getParentRoute: () => AuthenticatedMasterRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -307,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/contador': typeof AuthenticatedContadorRouteRouteWithChildren
+  '/master': typeof AuthenticatedMasterRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/cobrancas': typeof AuthenticatedCobrancasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -339,11 +382,16 @@ export interface FileRoutesByFullPath {
   '/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/master/convites': typeof AuthenticatedMasterConvitesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
   '/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
+  '/master/': typeof AuthenticatedMasterIndexRoute
+  '/master/empresas/$id': typeof AuthenticatedMasterEmpresasIdRoute
+  '/master/empresas/nova': typeof AuthenticatedMasterEmpresasNovaRoute
+  '/master/empresas/': typeof AuthenticatedMasterEmpresasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -382,11 +430,16 @@ export interface FileRoutesByTo {
   '/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/master/convites': typeof AuthenticatedMasterConvitesRoute
   '/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoIndexRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesIndexRoute
+  '/master': typeof AuthenticatedMasterIndexRoute
+  '/master/empresas/$id': typeof AuthenticatedMasterEmpresasIdRoute
+  '/master/empresas/nova': typeof AuthenticatedMasterEmpresasNovaRoute
+  '/master/empresas': typeof AuthenticatedMasterEmpresasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -396,6 +449,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   '/_authenticated/contador': typeof AuthenticatedContadorRouteRouteWithChildren
+  '/_authenticated/master': typeof AuthenticatedMasterRouteRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/cobrancas': typeof AuthenticatedCobrancasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -428,11 +482,16 @@ export interface FileRoutesById {
   '/_authenticated/financeiro/importar-nfe': typeof AuthenticatedFinanceiroImportarNfeRoute
   '/_authenticated/financeiro/regras-nomes': typeof AuthenticatedFinanceiroRegrasNomesRoute
   '/_authenticated/financeiro/transacoes': typeof AuthenticatedFinanceiroTransacoesRoute
+  '/_authenticated/master/convites': typeof AuthenticatedMasterConvitesRoute
   '/_authenticated/vendas/clientes': typeof AuthenticatedVendasClientesRoute
   '/_authenticated/vendas/pedidos': typeof AuthenticatedVendasPedidosRoute
   '/_authenticated/vendas/produtos': typeof AuthenticatedVendasProdutosRoute
   '/_authenticated/centros-de-custo/': typeof AuthenticatedCentrosDeCustoIndexRoute
   '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
+  '/_authenticated/master/': typeof AuthenticatedMasterIndexRoute
+  '/_authenticated/master/empresas/$id': typeof AuthenticatedMasterEmpresasIdRoute
+  '/_authenticated/master/empresas/nova': typeof AuthenticatedMasterEmpresasNovaRoute
+  '/_authenticated/master/empresas/': typeof AuthenticatedMasterEmpresasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -442,6 +501,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/centros-de-custo'
     | '/contador'
+    | '/master'
     | '/aprovacoes'
     | '/cobrancas'
     | '/dashboard'
@@ -474,11 +534,16 @@ export interface FileRouteTypes {
     | '/financeiro/importar-nfe'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
+    | '/master/convites'
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
     | '/centros-de-custo/'
     | '/configuracoes/'
+    | '/master/'
+    | '/master/empresas/$id'
+    | '/master/empresas/nova'
+    | '/master/empresas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -517,11 +582,16 @@ export interface FileRouteTypes {
     | '/financeiro/importar-nfe'
     | '/financeiro/regras-nomes'
     | '/financeiro/transacoes'
+    | '/master/convites'
     | '/vendas/clientes'
     | '/vendas/pedidos'
     | '/vendas/produtos'
     | '/centros-de-custo'
     | '/configuracoes'
+    | '/master'
+    | '/master/empresas/$id'
+    | '/master/empresas/nova'
+    | '/master/empresas'
   id:
     | '__root__'
     | '/'
@@ -530,6 +600,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/contador'
+    | '/_authenticated/master'
     | '/_authenticated/aprovacoes'
     | '/_authenticated/cobrancas'
     | '/_authenticated/dashboard'
@@ -562,11 +633,16 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro/importar-nfe'
     | '/_authenticated/financeiro/regras-nomes'
     | '/_authenticated/financeiro/transacoes'
+    | '/_authenticated/master/convites'
     | '/_authenticated/vendas/clientes'
     | '/_authenticated/vendas/pedidos'
     | '/_authenticated/vendas/produtos'
     | '/_authenticated/centros-de-custo/'
     | '/_authenticated/configuracoes/'
+    | '/_authenticated/master/'
+    | '/_authenticated/master/empresas/$id'
+    | '/_authenticated/master/empresas/nova'
+    | '/_authenticated/master/empresas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -655,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/master': {
+      id: '/_authenticated/master'
+      path: '/master'
+      fullPath: '/master'
+      preLoaderRoute: typeof AuthenticatedMasterRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/contador': {
       id: '/_authenticated/contador'
       path: '/contador'
@@ -668,6 +751,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/centros-de-custo'
       preLoaderRoute: typeof AuthenticatedCentrosDeCustoRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/master/': {
+      id: '/_authenticated/master/'
+      path: '/'
+      fullPath: '/master/'
+      preLoaderRoute: typeof AuthenticatedMasterIndexRouteImport
+      parentRoute: typeof AuthenticatedMasterRouteRoute
     }
     '/_authenticated/configuracoes/': {
       id: '/_authenticated/configuracoes/'
@@ -703,6 +793,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vendas/clientes'
       preLoaderRoute: typeof AuthenticatedVendasClientesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/master/convites': {
+      id: '/_authenticated/master/convites'
+      path: '/convites'
+      fullPath: '/master/convites'
+      preLoaderRoute: typeof AuthenticatedMasterConvitesRouteImport
+      parentRoute: typeof AuthenticatedMasterRouteRoute
     }
     '/_authenticated/financeiro/transacoes': {
       id: '/_authenticated/financeiro/transacoes'
@@ -879,6 +976,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalisesIndicadoresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/master/empresas/': {
+      id: '/_authenticated/master/empresas/'
+      path: '/empresas'
+      fullPath: '/master/empresas/'
+      preLoaderRoute: typeof AuthenticatedMasterEmpresasIndexRouteImport
+      parentRoute: typeof AuthenticatedMasterRouteRoute
+    }
+    '/_authenticated/master/empresas/nova': {
+      id: '/_authenticated/master/empresas/nova'
+      path: '/empresas/nova'
+      fullPath: '/master/empresas/nova'
+      preLoaderRoute: typeof AuthenticatedMasterEmpresasNovaRouteImport
+      parentRoute: typeof AuthenticatedMasterRouteRoute
+    }
+    '/_authenticated/master/empresas/$id': {
+      id: '/_authenticated/master/empresas/$id'
+      path: '/empresas/$id'
+      fullPath: '/master/empresas/$id'
+      preLoaderRoute: typeof AuthenticatedMasterEmpresasIdRouteImport
+      parentRoute: typeof AuthenticatedMasterRouteRoute
+    }
   }
 }
 
@@ -921,9 +1039,33 @@ const AuthenticatedContadorRouteRouteWithChildren =
     AuthenticatedContadorRouteRouteChildren,
   )
 
+interface AuthenticatedMasterRouteRouteChildren {
+  AuthenticatedMasterConvitesRoute: typeof AuthenticatedMasterConvitesRoute
+  AuthenticatedMasterIndexRoute: typeof AuthenticatedMasterIndexRoute
+  AuthenticatedMasterEmpresasIdRoute: typeof AuthenticatedMasterEmpresasIdRoute
+  AuthenticatedMasterEmpresasNovaRoute: typeof AuthenticatedMasterEmpresasNovaRoute
+  AuthenticatedMasterEmpresasIndexRoute: typeof AuthenticatedMasterEmpresasIndexRoute
+}
+
+const AuthenticatedMasterRouteRouteChildren: AuthenticatedMasterRouteRouteChildren =
+  {
+    AuthenticatedMasterConvitesRoute: AuthenticatedMasterConvitesRoute,
+    AuthenticatedMasterIndexRoute: AuthenticatedMasterIndexRoute,
+    AuthenticatedMasterEmpresasIdRoute: AuthenticatedMasterEmpresasIdRoute,
+    AuthenticatedMasterEmpresasNovaRoute: AuthenticatedMasterEmpresasNovaRoute,
+    AuthenticatedMasterEmpresasIndexRoute:
+      AuthenticatedMasterEmpresasIndexRoute,
+  }
+
+const AuthenticatedMasterRouteRouteWithChildren =
+  AuthenticatedMasterRouteRoute._addFileChildren(
+    AuthenticatedMasterRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentrosDeCustoRouteRoute: typeof AuthenticatedCentrosDeCustoRouteRouteWithChildren
   AuthenticatedContadorRouteRoute: typeof AuthenticatedContadorRouteRouteWithChildren
+  AuthenticatedMasterRouteRoute: typeof AuthenticatedMasterRouteRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedCobrancasRoute: typeof AuthenticatedCobrancasRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -961,6 +1103,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentrosDeCustoRouteRoute:
     AuthenticatedCentrosDeCustoRouteRouteWithChildren,
   AuthenticatedContadorRouteRoute: AuthenticatedContadorRouteRouteWithChildren,
+  AuthenticatedMasterRouteRoute: AuthenticatedMasterRouteRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedCobrancasRoute: AuthenticatedCobrancasRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

@@ -28,8 +28,10 @@ import {
   ShieldCheck,
   Palette,
 } from "lucide-react";
+import { Crown } from "lucide-react";
 import { useState } from "react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
+import { useSuperAdmin } from "@/lib/master";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -83,6 +85,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const { profile } = useCurrentCompany();
+  const { isSuperAdmin } = useSuperAdmin();
   const isAdmin = profile?.role === "admin";
   const isActive = (url: string) => pathname === url;
   const isInGroup = (items: { url: string }[]) =>
@@ -109,6 +112,21 @@ export function AppSidebar() {
             )}
           </div>
         </div>
+
+        {isSuperAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-amber-600 font-semibold flex items-center gap-1">
+              <Crown className="h-3.5 w-3.5" /> Super Admin
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <Item url="/master" icon={Crown} title="Painel" pathname={pathname} collapsed={collapsed} />
+                <Item url="/master/empresas" icon={Building2} title="Empresas" pathname={pathname} collapsed={collapsed} />
+                <Item url="/master/convites" icon={Bell} title="Convites" pathname={pathname} collapsed={collapsed} />
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup>
           <SidebarGroupLabel>Geral</SidebarGroupLabel>
