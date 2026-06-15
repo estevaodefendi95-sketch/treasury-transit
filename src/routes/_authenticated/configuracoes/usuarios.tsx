@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { MoreVertical, UserPlus, Users, Search, Pencil, Mail, Pause, Play, Trash2 } from "lucide-react";
 import { useCurrentCompany } from "@/hooks/useCurrentCompany";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { inviteUser } from "@/lib/users.functions";
 import {
   ROLE_OPTIONS, ROLE_LABEL, ROLE_BADGE, ROLE_AVATAR_BG, ROLE_LIMIT,
   STATUS_BADGE, STATUS_LABEL, initialsOf, formatDateTimeBR, roleLimitLabel,
@@ -300,6 +302,8 @@ function InviteUserModal({
   const [role, setRole] = useState<Role>("financeiro");
   const [saving, setSaving] = useState(false);
 
+  const invite = useServerFn(inviteUser);
+
   const reset = () => { setFullName(""); setEmail(""); setRole("financeiro"); };
 
   const submit = async () => {
@@ -310,15 +314,16 @@ function InviteUserModal({
     }
     setSaving(true);
     try {
-      const { error } = await supabase.from("profiles").insert({
-        id: crypto.randomUUID(),
-        company_id: companyId,
-        full_name: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        role,
-        status: "convite_pendente",
-      } as never);
-      if (error) throw error;
+      const res = await invite({
+        data: {
+          email: email.trim().toLowerCase(),
+          full_name: fullName.trim(),
+          role,
+          company_id: companyId,
+          redirect_to: `${window.location.origin}/auth`,
+        },
+      });
+      if (!res.ok) throw new Error(res.error);
       toast.success(`Convite enviado para ${email}`);
       reset();
       onClose();
