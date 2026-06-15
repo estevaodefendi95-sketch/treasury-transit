@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
@@ -68,6 +68,10 @@ function ImportarPage() {
   };
 
   const onFile = async (file: File) => {
+    if (!bankAccountId) {
+      toast.error("Selecione a conta bancária antes de importar.");
+      return;
+    }
     setFilename(file.name);
     setAnalyzing(true);
     try {
@@ -163,6 +167,7 @@ function ImportarPage() {
   const finalize = useMutation({
     mutationFn: async () => {
       if (!companyId) throw new Error("Sem empresa");
+      if (!bankAccountId) throw new Error("Selecione a conta bancária antes de concluir.");
       let linked = 0, created = 0, ignored = 0;
 
       // 1) cria registro de import
@@ -222,7 +227,7 @@ function ImportarPage() {
             amount,
             due_date: m.row.date,
             payment_date: m.row.date,
-            bank_account_id: bankAccountId || null,
+            bank_account_id: bankAccountId,
             category_id: m.categoryId || null,
             is_reconciled: true,
             bank_statement_import_id: impRec.id,
@@ -242,10 +247,10 @@ function ImportarPage() {
             });
           }
         }
-        // snapshot do extrato
+        // snapshot do extrato — bank_account_id é NOT NULL
         await insertRow("bank_statements", {
           company_id: companyId,
-          bank_account_id: bankAccountId || null,
+          bank_account_id: bankAccountId,
           date: m.row.date,
           description: descr,
           amount: m.row.amount,
@@ -330,40 +335,66 @@ function ImportarPage() {
         <Card>
           <CardHeader><CardTitle className="text-base">Upload do arquivo</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            {bankAccounts.length > 0 && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Conta bancária (opcional)</label>
-                <select
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  value={bankAccountId}
-                  onChange={(e) => setBankAccountId(e.target.value)}
-                >
-                  <option value="">— Selecione —</option>
-                  {bankAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-                </select>
+            {bankAccounts.length === 0 ? (
+              <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 space-y-3">
+                <p className="font-medium">Nenhuma conta bancária cadastrada.</p>
+                <p>
+                  É necessário ter ao menos uma conta bancária para importar um extrato,
+                  pois cada movimentação precisa ser vinculada a uma conta.
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/financeiro/contas-bancarias">Cadastrar conta bancária</Link>
+                </Button>
               </div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Conta bancária <span className="text-rose-600">*</span>
+                  </label>
+                  <select
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    value={bankAccountId}
+                    onChange={(e) => setBankAccountId(e.target.value)}
+                  >
+                    <option value="">— Selecione a conta —</option>
+                    {bankAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </select>
+                  {!bankAccountId && (
+                    <p className="text-xs text-muted-foreground">
+                      Selecione a conta de destino antes de enviar o arquivo.
+                    </p>
+                  )}
+                </div>
+
+                <label
+                  className={cn(
+                    "border-2 border-dashed rounded-lg p-10 flex flex-col items-center gap-2 transition-colors",
+                    bankAccountId
+                      ? "border-border cursor-pointer hover:border-primary"
+                      : "border-border/60 opacity-50 cursor-not-allowed pointer-events-none",
+                  )}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const f = e.dataTransfer.files[0];
+                    if (f) onFile(f);
+                  }}
+                >
+                  {analyzing ? (
+                    <><Loader2 className="h-10 w-10 animate-spin text-primary" /><p className="text-sm">Analisando com IA...</p></>
+                  ) : (
+                    <>
+                      <Upload className="h-10 w-10 text-muted-foreground" />
+                      <p className="text-sm font-medium">Arraste ou clique para selecionar</p>
+                      <p className="text-xs text-muted-foreground">Formatos: .ofx, .qfx, .pdf</p>
+                    </>
+                  )}
+                  <input type="file" accept=".ofx,.qfx,.pdf" className="hidden" disabled={!bankAccountId}
+                    onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
+                </label>
+              </>
             )}
-            <label
-              className="border-2 border-dashed border-border rounded-lg p-10 flex flex-col items-center gap-2 cursor-pointer hover:border-primary transition-colors"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const f = e.dataTransfer.files[0];
-                if (f) onFile(f);
-              }}
-            >
-              {analyzing ? (
-                <><Loader2 className="h-10 w-10 animate-spin text-primary" /><p className="text-sm">Analisando com IA...</p></>
-              ) : (
-                <>
-                  <Upload className="h-10 w-10 text-muted-foreground" />
-                  <p className="text-sm font-medium">Arraste ou clique para selecionar</p>
-                  <p className="text-xs text-muted-foreground">Formatos: .ofx, .qfx, .pdf</p>
-                </>
-              )}
-              <input type="file" accept=".ofx,.qfx,.pdf" className="hidden"
-                onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
-            </label>
           </CardContent>
         </Card>
       )}
