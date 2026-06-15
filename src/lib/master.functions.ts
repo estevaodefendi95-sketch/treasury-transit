@@ -35,7 +35,7 @@ export type MasterStats = {
 
 // ---------- Sou Super Admin? (gating de UI/rota — não lança) ----------
 export const amISuperAdmin = createServerFn({ method: "POST" })
-  .validator((d: unknown) => Token.parse(d))
+  .inputValidator((d: unknown) => Token.parse(d))
   .handler(async ({ data }) => {
     try {
       await requireSuperAdmin(data.token);
@@ -47,7 +47,7 @@ export const amISuperAdmin = createServerFn({ method: "POST" })
 
 // ---------- Listar empresas + admin + contagem ----------
 export const listCompanies = createServerFn({ method: "POST" })
-  .validator((d: unknown) => Token.parse(d))
+  .inputValidator((d: unknown) => Token.parse(d))
   .handler(async ({ data }): Promise<MasterCompany[]> => {
     const { admin } = await requireSuperAdmin(data.token);
     const { data: companies, error } = await admin
@@ -86,7 +86,7 @@ export const listCompanies = createServerFn({ method: "POST" })
 
 // ---------- Estatísticas resumo ----------
 export const masterStats = createServerFn({ method: "POST" })
-  .validator((d: unknown) => Token.parse(d))
+  .inputValidator((d: unknown) => Token.parse(d))
   .handler(async ({ data }): Promise<MasterStats> => {
     const { admin } = await requireSuperAdmin(data.token);
     const { data: rows, error } = await admin.from("companies").select("status");
@@ -113,7 +113,7 @@ const CreateCompany = Token.extend({
 });
 
 export const createCompanyWithAdmin = createServerFn({ method: "POST" })
-  .validator((d: unknown) => CreateCompany.parse(d))
+  .inputValidator((d: unknown) => CreateCompany.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const companyId = crypto.randomUUID();
@@ -158,7 +158,7 @@ export const createCompanyWithAdmin = createServerFn({ method: "POST" })
 const ById = Token.extend({ id: z.string().min(1) });
 
 export const getCompanyDetail = createServerFn({ method: "POST" })
-  .validator((d: unknown) => ById.parse(d))
+  .inputValidator((d: unknown) => ById.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { data: company, error } = await admin
@@ -201,7 +201,7 @@ const UpdateCompany = ById.extend({
 });
 
 export const updateCompany = createServerFn({ method: "POST" })
-  .validator((d: unknown) => UpdateCompany.parse(d))
+  .inputValidator((d: unknown) => UpdateCompany.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { error } = await admin.from("companies").update(data.fields).eq("id", data.id);
@@ -217,7 +217,7 @@ const InviteUser = ById.extend({
 });
 
 export const inviteCompanyUser = createServerFn({ method: "POST" })
-  .validator((d: unknown) => InviteUser.parse(d))
+  .inputValidator((d: unknown) => InviteUser.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { data: invited, error: e1 } = await admin.auth.admin.inviteUserByEmail(data.email);
@@ -241,7 +241,7 @@ export const inviteCompanyUser = createServerFn({ method: "POST" })
 
 // ---------- Convites pendentes (todas as empresas) ----------
 export const listPendingInvites = createServerFn({ method: "POST" })
-  .validator((d: unknown) => Token.parse(d))
+  .inputValidator((d: unknown) => Token.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { data: invites, error } = await admin
@@ -266,7 +266,7 @@ export const listPendingInvites = createServerFn({ method: "POST" })
 // ---------- Reenviar convite ----------
 const InviteId = Token.extend({ email: z.string().email() });
 export const resendInvite = createServerFn({ method: "POST" })
-  .validator((d: unknown) => InviteId.parse(d))
+  .inputValidator((d: unknown) => InviteId.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { error } = await admin.auth.admin.inviteUserByEmail(data.email);
@@ -277,7 +277,7 @@ export const resendInvite = createServerFn({ method: "POST" })
 // ---------- Cancelar convite (remove profile pendente) ----------
 const CancelInvite = Token.extend({ profileId: z.string().min(1) });
 export const cancelInvite = createServerFn({ method: "POST" })
-  .validator((d: unknown) => CancelInvite.parse(d))
+  .inputValidator((d: unknown) => CancelInvite.parse(d))
   .handler(async ({ data }) => {
     const { admin } = await requireSuperAdmin(data.token);
     const { error } = await admin
